@@ -1,0 +1,99 @@
+# 'service' is the name of the service
+service: ${self:custom.projectName}-form-service
+
+# 'custom' is a place to define custom variables used elsewhere in the yaml config
+custom:
+  defaultStage: prod
+  currentStage: ${opt:stage, self:custom.defaultStage}
+  projectName: ${file(./config.${self:custom.currentStage}.json):projectName}
+  currentRegion: ${file(./config.${self:custom.currentStage}.json):region}
+  formsTable: ${self:custom.projectName}-${self:custom.currentStage}-forms
+  entriesTable: ${self:custom.projectName}-${self:custom.currentStage}-form-entries
+
+# 'provider' specifies where to deploy the service. Aka deploy to 'aws'
+provider:
+  name: aws
+  runtime: nodejs6.10
+  # ${self:custom.currentRegion} references the 'custom' field in this file
+  # it grabs the 'currentRegion' key and places it in the 'region' key defined below
+  region: ${self:custom.currentRegion}
+  stage: ${self:custom.currentStage}
+  # 'environment' is where you define any process.env environment variables needed in code
+  environment:
+    FORMS_TABLE: ${self:custom.formsTable}
+    ENTRIES_TABLE: ${self:custom.entriesTable}
+  # Set IAM permissions for the functions
+  iamRoleStatements:
+  - Effect: Allow
+    Action:
+      - dynamodb:DescribeTable
+      - dynamodb:Query
+      - dynamodb:Scan
+      - dynamodb:GetItem
+      - dynamodb:PutItem
+      - dynamodb:UpdateItem
+      - dynamodb:DeleteItem
+      - dynamodb:BatchWriteItem
+    # Allow function to access only this database
+    Resource: [
+      "arn:aws:dynamodb:${self:custom.currentRegion}:*:table/${self:custom.formsTable}",
+      "arn:aws:dynamodb:${self:custom.currentRegion}:*:table/${self:custom.entriesTable}"
+      ]
+
+# 'functions' references all the functions and events in the service
+functions:
+  handleFormSubmission:
+    handler: handler.handleFormSubmission
+    events:
+      - http:
+          path: handle-submission
+          method: post
+          cors: true
+  getFormSubmissions:
+    handler: handler.getFormSubmissions
+    events:
+      - http:
+          path: get-submissions
+          method: post
+          cors: true
+  getForms:
+    handler: handler.getForms
+    events:
+      - http:
+          path: get-forms
+          method: post
+          cors: true
+
+# 'resources' defines any infrastructure needed for the service aka a database
+resources:
+  Resources:
+    FormsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.formsTable}
+        AttributeDefinitions:
+          - AttributeName: formId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: formId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+    EntriesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.entriesTable}
+        AttributeDefinitions:
+          - AttributeName: formId
+            AttributeType: S
+          - AttributeName: timestamp
+            AttributeType: N
+        KeySchema:
+          - AttributeName: formId
+            KeyType: HASH
+          - AttributeName: timestamp
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
