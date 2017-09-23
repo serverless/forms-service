@@ -1,0 +1,11 @@
+{
+  "name": "forms-service",
+  "version": "0.0.1",
+  "description": "Form service",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "cd frontend && npm i"
+  },
+  "author": "David Wells",
+  "license": "MIT"
+}
