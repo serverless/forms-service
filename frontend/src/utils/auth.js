@@ -1,25 +1,11 @@
 import { EventEmitter } from 'events'
-import Auth0Lock from 'auth0-lock'
+import lockInstance from './authLockInstance'
 import decode from 'jwt-decode'
-import { AUTH_CONFIG } from './auth.config.js'
 import history from './history'
 
 export default class Auth extends EventEmitter {
-  // https://auth0.com/docs/libraries/lock/v10/customization
-  lock = new Auth0Lock(AUTH_CONFIG.clientId, AUTH_CONFIG.domain, {
-    oidcConformant: true,
-    autoclose: true,
-    autofocus: true,
-    allowedConnections: ['Username-Password-Authentication'],
-    auth: {
-      redirectUrl: AUTH_CONFIG.callbackUrl,
-      responseType: 'token id_token',
-      audience: AUTH_CONFIG.apiUrl,
-      params: {
-        scope: 'openid profile read:messages'
-      }
-    }
-  })
+
+  lock = lockInstance()
 
   userProfile
 
@@ -39,10 +25,23 @@ export default class Auth extends EventEmitter {
 
   login() {
     // Call the show method to display the widget.
-    this.lock.show()
+    this.lock.show({
+      initialScreen: 'login',
+      auth: {
+       params: {
+         state: 'hellostate', // xsrf
+         scope: 'openid offline_access',
+         other: 'what'
+       },
+     },
+    })
   }
 
   setSession(authResult) {
+    console.log('authResult', authResult)
+    console.log(authResult.state)
+    const result = authResult
+    // debugger
     if (authResult && authResult.accessToken && authResult.idToken) {
       // Set the time that the access token will expire at
       let expiresAt = JSON.stringify(
