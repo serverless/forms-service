@@ -22,6 +22,7 @@ provider:
   environment:
     FORMS_TABLE: ${self:custom.formsTable}
     ENTRIES_TABLE: ${self:custom.entriesTable}
+    SENDGRID_API_KEY: ${file(./config.${self:custom.currentStage}.json):SENDGRID_API_KEY}
   # Set IAM permissions for the functions
   iamRoleStatements:
   - Effect: Allow
@@ -54,6 +55,13 @@ functions:
     events:
       - http:
           path: get-submissions
+          method: post
+          cors: true
+  updateFormSettings:
+    handler: handler.updateFormSettings
+    events:
+      - http:
+          path: update-form
           method: post
           cors: true
   getForms:
