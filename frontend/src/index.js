@@ -1,9 +1,22 @@
+import React from 'react'
 import ReactDOM from 'react-dom'
 import { makeMainRoutes } from './routes'
-import './index.css'
+import { Provider } from 'react-redux'
+import configureStore from './store'
+import './index.global.css'
 
+const mount = document.getElementById('root')
 const routes = makeMainRoutes()
-const mountNode = document.getElementById('root')
+const store = configureStore()
 
-// render app
-ReactDOM.render(routes, mountNode)
+window.store = store
+
+// Main application wrapped with Redux
+const app = (
+  <Provider store={store}>
+    {routes}
+  </Provider>
+)
+
+// render app to DOM
+ReactDOM.render(app, mount)

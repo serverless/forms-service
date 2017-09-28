@@ -1,20 +1,14 @@
 import React, { Component } from 'react'
-import './App.css'
 
 class App extends Component {
   goTo(route) {
     this.props.history.replace(`/${route}`)
   }
-  login = () => {
-    this.props.auth.login()
-  }
-  logout = () => {
-    this.props.auth.logout()
-  }
-  renderNav() {
-    const { isAuthenticated } = this.props.auth
-    let loggedInNav, loggedOutNav
-    if (isAuthenticated()) {
+  renderNavigation() {
+    const { auth } = this.props
+    const authed = auth.isAuthenticated()
+    let loggedInNav
+    if (authed) {
       loggedInNav = (
         <div>
           <button className="btn-margin" onClick={this.goTo.bind(this, 'forms')}>
@@ -23,15 +17,17 @@ class App extends Component {
           <button className="btn-margin" onClick={this.goTo.bind(this, 'profile')}>
             Profile
           </button>
-          <button className="btn-margin" onClick={this.logout}>
+          <button className="btn-margin" onClick={auth.logout}>
             Log Out
           </button>
         </div>
       )
-    } else {
+    }
+    let loggedOutNav
+    if (!authed) {
       loggedOutNav = (
         <div>
-          <button className="btn-margin" onClick={this.login}>
+          <button className="btn-margin" onClick={auth.login}>
             Log In
           </button>
         </div>
@@ -46,31 +42,27 @@ class App extends Component {
     )
   }
   render() {
-    const { isAuthenticated } = this.props.auth
-    const authedTrue = isAuthenticated()
-    let renderLoginButton
-    if (!authedTrue) {
-      renderLoginButton = (
+    const { auth, children } = this.props
+    let loginButton
+    if (!auth.isAuthenticated()) {
+      loginButton = (
         <div>
           <h3>You will need to login to use the app</h3>
-          <button className="btn-margin" onClick={this.login}>
+          <button className="btn-margin" onClick={auth.login}>
             Log In
           </button>
         </div>
       )
     }
-
     return (
       <div>
-        <div>
-          {this.renderNav()}
-        </div>
+        {this.renderNavigation()}
         <div className="App-header">
           <h2>Serverless Form Manager</h2>
         </div>
         <div className="container">
-          {this.props.children}
-          {renderLoginButton}
+          {children}
+          {loginButton}
         </div>
       </div>
     )

@@ -21,7 +21,7 @@ export default class Profile extends Component {
     return (
       <div className="profile-area">
         <h1>{profile.name}</h1>
-        <div header="Profile">
+        <div>
           <img src={profile.picture} alt="profile" />
           <div>
             Nickname

@@ -1,35 +1,25 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
+import * as formActions from '../../redux/forms'
 import { config } from '../../_config'
 
-function getForms() {
-  return axios.post(config.api.forms).then((response) => {
-    console.log(response)
-    const forms = response.data
-    return forms
-  }).catch((err) => {
-    console.log(err)
-    return []
-  })
-}
-
-export default class FormList extends Component {
-  constructor (props, context) {
-    super(props, context)
-    this.state = {
-      forms: false
+class FormListContainer extends Component {
+  componentDidMount() {
+    const { forms, dispatch } = this.props
+    // if no forms or is past refresh timestamp
+    // !forms || pastRefreshTime
+    if (!forms || forms.length === 0) {
+      this.loadForms()
     }
   }
-  componentDidMount() {
-    getForms().then((forms) => {
-      this.setState({
-        forms: forms
-      })
-    })
+  loadForms = () => {
+    this.props.dispatch(formActions.getAllForms())
   }
   renderFormList() {
-    const { forms } = this.state
+    console.log(this.props)
+    const { forms } = this.props
     if (!forms) return null
     const formListItems = forms.map((form, i) => {
       return (
@@ -42,15 +32,48 @@ export default class FormList extends Component {
     })
     return <ul>{formListItems}</ul>
   }
-  // https://tympanus.net/Tutorials/StickyTableHeaders/index.html
   render() {
+    const { loading, error } = this.props
+    let formsList = this.renderFormList()
+
+    if (loading) {
+      formsList = (
+        <div>
+          Loading Homie
+        </div>
+      )
+    }
+
+    if (error) {
+      formsList = (
+        <div>
+          Sorry dude {error.message}
+        </div>
+      )
+    }
+
     return (
       <div className="App">
         <div className="App-intro">
           <h1>Forms</h1>
-          {this.renderFormList()}
+          <button onClick={this.loadForms}>Refresh form list</button>
+          {formsList}
         </div>
       </div>
     )
   }
 }
+
+function mapReduxStateToProps({forms}) {
+  return {
+    forms: forms.forms,
+    loading: forms.loading,
+    error: forms.error
+  }
+}
+
+const FormList = connect(
+  mapReduxStateToProps,
+)(FormListContainer)
+
+export default FormList
