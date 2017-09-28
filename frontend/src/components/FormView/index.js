@@ -5,19 +5,6 @@ import axios from 'axios'
 import * as formActions from '../../redux/forms'
 import { config } from '../../_config'
 
-function getSubmissions(formId) {
-  return axios.post(config.api.submissions,{
-    formId: formId
-  }).then((response) => {
-    console.log(response)
-    const forms = response.data
-    return forms
-  }).catch((err) => {
-    console.log(err)
-    return []
-  })
-}
-
 class FormViewContainer extends Component {
   loadFormData = () => {
     const { dispatch, match } = this.props
@@ -41,7 +28,9 @@ class FormViewContainer extends Component {
     const formId = match.params.id
     const submissions = formData[formId]
     if (!submissions) return null
-    const submissionItems = submissions.map((data, i) => {
+    const sortOrder = 'desc'
+    const order = sortDate('timestamp', sortOrder)
+    const submissionItems = submissions.sort(order).map((data, i) => {
       console.log('data', data)
       const date = formatTime(data.timestamp)
       const prettyDate = new Date(data.timestamp * 1000).toDateString()
@@ -106,6 +95,18 @@ function formatTime(timestamp) {
   const seconds = "0" + date.getSeconds()
   // Will display time in 10:30:23 format
   return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2)
+}
+
+function sortDate(field, order) {
+  return function (a, b) {
+    const timeA = new Date(a[field]).getTime()
+    const timeB = new Date(b[field]).getTime()
+    if (order === 'asc') {
+      return timeA - timeB
+    }
+    // default 'desc' descending order
+    return timeB - timeA
+  }
 }
 
 function mapReduxStateToProps({forms}) {
