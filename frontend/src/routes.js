@@ -11,7 +11,6 @@ const auth = new Auth()
 
 export const makeMainRoutes = () => {
   const isAuthed = auth.isAuthenticated()
-
   // Route View Components
   const homeRedirect = <Redirect to="/" />
   const appShell = (props) => <App auth={auth} {...props} />
@@ -33,25 +32,3 @@ export const makeMainRoutes = () => {
     </BrowserRouter>
   )
 }
-
-/*
-// Nested Routes
-// https://stackoverflow.com/questions/42254929/how-to-nest-routes-in-react-router-v4
-function NestedRoute(props) {
-  console.log('props', props)
-  const component = p => <props.component {...p} children={props.children} />
-  return <Route exact={props.exact} path={props.path} render={component} />
-}
-
-// Usage:
-const CompoWithSub = props => <div>Thing! {props.children}</div>
-const SubComponentA = props => {
-  return <div>l{props.match.params.id}</div>
-}
-const SubComponentB = props => <div>hehehehehe</div>
-
-<RouteNest  path={'/thing'} component={CompoWithSub}>
-  <RouteNest  path={'/thing/suba'} component={SubComponentA}/>
-  <RouteNest  path={'/thing/subb'} component={SubComponentB}/>
-</RouteNest>
-/**/
