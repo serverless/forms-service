@@ -1,8 +1,118 @@
 const awsSDK = require('aws-sdk')
 const dynamoDoc = new awsSDK.DynamoDB.DocumentClient()
+const sendEmail = require('./sendEmail')
 const ENTRIES_TABLE = process.env.ENTRIES_TABLE
 const FORMS_TABLE = process.env.FORMS_TABLE
+const corsHeaders = {
+  // Required for CORS support to work
+  'Access-Control-Allow-Origin': '*',
+  // Required for cookies, authorization headers with HTTPS
+  'Access-Control-Allow-Credentials': true
+}
+/*
+  Update forms table and form entries table on form submission
+*/
+module.exports.handleFormSubmission = (event, context, callback) => {
+  const body = JSON.parse(event.body)
+  const formId = body.formId
+  const fields = body.fields
+  const timestamp = Math.round(+new Date() / 1000)
 
+  if (body.action === 'ping') {
+    return callback(null, {
+      statusCode: 200,
+      body: JSON.stringify({
+        pong: true,
+      })
+    })
+  }
+
+  if (!formId) {
+    return callback(new Error('[400] No formId passed into function'))
+  }
+
+  if (!fields) {
+    return callback(new Error('[400] No fields passed into function'))
+  }
+
+  const params = {
+    TableName: FORMS_TABLE,
+    Key: {
+      formId: formId
+    },
+    // Update or create items
+    UpdateExpression: 'SET #updated = :updated, #created = if_not_exists(#created, :created) ADD #submissionCount :incr',
+    ExpressionAttributeNames: {
+      '#updated': 'updated',
+      '#created': 'created',
+      '#submissionCount': 'submissionCount'
+    },
+    ExpressionAttributeValues: {
+      ':incr': 1,
+      ':created': timestamp,
+      ':updated': timestamp,
+    },
+    ReturnValues: 'ALL_NEW'
+  };
+
+  dynamoDoc.update(params).promise().then((data) => {
+    if (!data || !data.Attributes) {
+      return callback(new Error('[500] Database error. No form Data'))
+    }
+    const formInfo = data.Attributes
+    console.log('Form Submission count', formInfo.submissionCount)
+
+    // Now Save data to form entries table
+    const formEntry = Object.assign({}, {
+      formId: formId,
+      timestamp: timestamp,
+    }, fields)
+
+    const entryParams = {
+      TableName: ENTRIES_TABLE,
+      Item: formEntry
+    }
+
+    return dynamoDoc.put(entryParams).promise().then((d) => {
+      // then send email
+      if (formInfo && formInfo.notify) {
+        const emails = formInfo.notify
+        if (emails) {
+          // TODO: split emails at comma
+          sendEmail(emails, formEntry, (err, response) => {
+            if (err) {
+              return callback(err)
+            }
+            return callback(null, {
+              statusCode: 200,
+              headers: corsHeaders,
+              body: JSON.stringify({
+                success: true,
+                data: d
+              })
+            })
+          })
+        }
+      }
+      // return and send no emails
+      return callback(null, {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({
+          success: true,
+          data: d
+        })
+      })
+    })
+  }).catch((e) => {
+    console.log(e)
+    return callback(new Error('[500] Database error', e))
+  })
+}
+
+/*
+  Update forms table and form entries table on form submission
+*/
 module.exports.getFormSubmissions = (event, context, callback) => {
   console.log(event)
   const body = JSON.parse(event.body)
@@ -52,12 +162,7 @@ module.exports.getFormSubmissions = (event, context, callback) => {
   getFormResults().then((items) => {
     return callback(null, {
       statusCode: 200,
-      headers: {
-        // Required for CORS support to work
-        'Access-Control-Allow-Origin': '*',
-        // Required for cookies, authorization headers with HTTPS
-        'Access-Control-Allow-Credentials': true
-      },
+      headers: corsHeaders,
       body: JSON.stringify(items)
     })
   }).catch((e) => {
@@ -66,31 +171,17 @@ module.exports.getFormSubmissions = (event, context, callback) => {
   })
 }
 
-/*
-  Update forms table and form entries table on form submission
-*/
-module.exports.handleFormSubmission = (event, context, callback) => {
+module.exports.updateFormSettings = (event, context, callback) => {
   const body = JSON.parse(event.body)
   const formId = body.formId
-  const fields = body.fields
-  const timestamp = Math.round(+new Date() / 1000)
-
-
-  if (body.action === 'ping') {
-    return callback(null, {
-      statusCode: 200,
-      body: JSON.stringify({
-        pong: true,
-      })
-    })
-  }
+  const emails = body.emails
 
   if (!formId) {
     return callback(new Error('[400] No formId passed into function'))
   }
 
-  if (!fields) {
-    return callback(new Error('[400] No fields passed into function'))
+  if (!emails) {
+    return callback(new Error('[400] No emails passed into function'))
   }
 
   const params = {
@@ -99,50 +190,23 @@ module.exports.handleFormSubmission = (event, context, callback) => {
       formId: formId
     },
     // Update or create items
-    UpdateExpression: 'SET #updated = :updated, #created = if_not_exists(#created, :created) ADD #submissionCount :incr',
+    UpdateExpression: 'SET #notify = :notify',
     ExpressionAttributeNames: {
-      '#updated': 'updated',
-      '#created': 'created',
-      '#submissionCount': 'submissionCount'
+      '#notify': 'notify',
     },
     ExpressionAttributeValues: {
-      ':incr': 1,
-      ':created': timestamp,
-      ':updated': timestamp,
+      ':notify': emails,
     },
     ReturnValues: 'UPDATED_NEW'
   };
 
   dynamoDoc.update(params).promise().then((data) => {
-    if (data && data.Attributes && data.Attributes.submissionCount) {
-      const count = data.Attributes.submissionCount
-      console.log('Form Submission count', count)
-    }
-
-    // Save data to form entries table
-    const formEntry = Object.assign({}, {
-      formId: formId,
-      timestamp: timestamp,
-    }, fields)
-
-    const entryParams = {
-      TableName: ENTRIES_TABLE,
-      Item: formEntry
-    }
-
-    return dynamoDoc.put(entryParams).promise().then((d) => {
-      return callback(null, {
-        statusCode: 200,
-        headers: {
-          // Required for CORS support to work
-          'Access-Control-Allow-Origin': '*',
-          // Required for cookies, authorization headers with HTTPS
-          'Access-Control-Allow-Credentials': true
-        },
-        body: JSON.stringify({
-          success: true,
-          data: d
-        })
+    return callback(null, {
+      statusCode: 200,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        success: true,
+        data: data
       })
     })
   }).catch((e) => {
@@ -151,7 +215,9 @@ module.exports.handleFormSubmission = (event, context, callback) => {
   })
 }
 
-
+/*
+  Get form list
+*/
 module.exports.getForms = (event, context, callback) => {
 
   let params = {
@@ -177,12 +243,7 @@ module.exports.getForms = (event, context, callback) => {
   getAllForms().then((forms) => {
     return callback(null, {
       statusCode: 200,
-      headers: {
-        // Required for CORS support to work
-        'Access-Control-Allow-Origin': '*',
-        // Required for cookies, authorization headers with HTTPS
-        'Access-Control-Allow-Credentials': true
-      },
+      headers: corsHeaders,
       body: JSON.stringify(forms)
     })
   }).catch((e) => {
