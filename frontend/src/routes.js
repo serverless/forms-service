@@ -1,6 +1,6 @@
 import React from 'react'
 import { Redirect, Route, Switch, BrowserRouter } from 'react-router-dom'
-import App from './App'
+import AppShell from './components/AppShell'
 import FormList from './components/FormList'
 import FormView from './components/FormView'
 import Profile from './components/profile'
@@ -13,7 +13,7 @@ export const makeMainRoutes = () => {
   const isAuthed = auth.isAuthenticated()
   // Route View Components
   const homeRedirect = <Redirect to="/" />
-  const appShell = (props) => <App auth={auth} {...props} />
+  const appShell = (props) => <AppShell auth={auth} {...props} />
   const forms = (props) => !isAuthed ? homeRedirect : <FormList auth={auth} {...props} />
   const profile = (props) => !isAuthed ? homeRedirect : <Profile auth={auth} {...props} />
   const callback = (props) => <Callback {...props} />
