@@ -1,5 +1,7 @@
 {
   "projectName": "site",
   "region": "us-west-2",
-  "SENDGRID_API_KEY": ""
+  "AUTH0_DOMAIN": "xyz.auth0.com",
+  "AUTH0_CLIENT_ID": "12345",
+  "SENDGRID_API_KEY": "your-send-grid-api-key"
 }

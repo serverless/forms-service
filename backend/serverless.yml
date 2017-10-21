@@ -23,6 +23,8 @@ provider:
     FORMS_TABLE: ${self:custom.formsTable}
     ENTRIES_TABLE: ${self:custom.entriesTable}
     SENDGRID_API_KEY: ${file(./config.${self:custom.currentStage}.json):SENDGRID_API_KEY}
+    AUTH0_DOMAIN: ${file(./config.${self:custom.currentStage}.json):AUTH0_DOMAIN}
+    AUTH0_CLIENT_ID: ${file(./config.${self:custom.currentStage}.json):AUTH0_CLIENT_ID}
   # Set IAM permissions for the functions
   iamRoleStatements:
   - Effect: Allow
@@ -43,26 +45,35 @@ provider:
 
 # 'functions' references all the functions and events in the service
 functions:
-  handleFormSubmission:
-    handler: handler.handleFormSubmission
+  auth:
+    handler: handler.auth
     events:
       - http:
-          path: handle-submission
+          path: auth
           method: post
           cors: true
-  getFormSubmissions:
-    handler: handler.getFormSubmissions
+  handleFormEntry:
+    handler: handler.handleFormEntry
     events:
       - http:
-          path: get-submissions
+          path: handle-entry
           method: post
+          cors: true
+  getFormEntries:
+    handler: handler.getFormEntries
+    events:
+      - http:
+          path: get-entries
+          method: post
+          authorizer: auth
           cors: true
   updateFormSettings:
     handler: handler.updateFormSettings
     events:
       - http:
-          path: update-form
+          path: update-form-settings
           method: post
+          authorizer: auth
           cors: true
   getForms:
     handler: handler.getForms
@@ -70,6 +81,7 @@ functions:
       - http:
           path: get-forms
           method: post
+          authorizer: auth
           cors: true
 
 # 'resources' defines any infrastructure needed for the service aka a database
@@ -105,3 +117,13 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        # GlobalSecondaryIndexes:
+        # - IndexName: contacts
+        #   KeySchema:
+        #   - AttributeName: email
+        #     KeyType: HASH
+        #   Projection:
+        #     ProjectionType: KEYS_ONLY
+        #   ProvisionedThroughput:
+        #     ReadCapacityUnits: 1
+        #     WriteCapacityUnits: 1
