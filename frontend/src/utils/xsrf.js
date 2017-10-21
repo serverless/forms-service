@@ -7,13 +7,17 @@ function setXsrfToken() {
   return xsrfToken
 }
 
-export function getXsrfToken() {
-  return localStorage.getItem(XSRF_TOKEN_KEY)
-}
-
 export function initializeXsrfToken() {
   const token = getXsrfToken()
   if (token) return token
   // no token found. Set token
   return setXsrfToken()
+}
+
+export function clearXsrfToken() {
+  return localStorage.removeItem(XSRF_TOKEN_KEY)
+}
+
+export function getXsrfToken() {
+  return localStorage.getItem(XSRF_TOKEN_KEY)
 }

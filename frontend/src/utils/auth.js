@@ -1,8 +1,11 @@
 import { EventEmitter } from 'events'
 import lockInstance from './authLockInstance'
+import { getXsrfToken, clearXsrfToken } from './xsrf'
+import queryString from 'query-string'
 import decode from 'jwt-decode'
 import history from './history'
 
+// p&0zwb@QGCUquC
 export default class Auth extends EventEmitter {
 
   lock = lockInstance()
@@ -14,7 +17,9 @@ export default class Auth extends EventEmitter {
     // Add callback Lock's `authenticated` event
     this.lock.on('authenticated', this.setSession.bind(this))
     // Add callback for Lock's `authorization_error` event
-    this.lock.on('authorization_error', error => console.log(error))
+    this.lock.on('authorization_error', (error) => {
+      console.log(error)
+    })
     // binds functions to keep this context
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
@@ -24,14 +29,16 @@ export default class Auth extends EventEmitter {
   }
 
   login() {
+    const token = getXsrfToken()
+    const location = encodeURIComponent(window.location.href)
+    const state = `token=${token}&url=${location}`
     // Call the show method to display the widget.
     this.lock.show({
       initialScreen: 'login',
       auth: {
        params: {
-         state: 'hellostate', // xsrf
-         scope: 'openid offline_access',
-         other: 'what'
+         state: state, // xsrf protection
+         scope: 'openid email offline_access'
        },
      },
     })
@@ -40,18 +47,27 @@ export default class Auth extends EventEmitter {
   setSession(authResult) {
     console.log('authResult', authResult)
     console.log(authResult.state)
-    const result = authResult
-    // debugger
+    const token = getXsrfToken()
+    const state = queryString.parse(authResult.state)
+    if (state.token !== token) {
+      // reset token
+      clearXsrfToken()
+      alert('Your Security token expired. Please login again')
+      // redirect to previous page
+      window.location.href = state.url
+      return false
+    }
+    
     if (authResult && authResult.accessToken && authResult.idToken) {
       // Set the time that the access token will expire at
-      let expiresAt = JSON.stringify(
+      const expiresAt = JSON.stringify(
         authResult.expiresIn * 1000 + new Date().getTime()
       )
       localStorage.setItem('access_token', authResult.accessToken)
       localStorage.setItem('id_token', authResult.idToken)
       localStorage.setItem('expires_at', expiresAt)
       // navigate to the forms route
-      history.replace('/forms')
+      history.replace('/forms/')
     }
   }
 
@@ -66,10 +82,13 @@ export default class Auth extends EventEmitter {
   getProfile(cb) {
     let accessToken = this.getAccessToken()
     this.lock.getUserInfo(accessToken, (err, profile) => {
+      console.log('profile', profile)
       if (profile) {
         this.userProfile = profile
       }
-      cb(err, profile)
+      if (cb && typeof cb === 'function') {
+        return cb(err, profile)
+      }
     })
   }
 
@@ -83,11 +102,9 @@ export default class Auth extends EventEmitter {
     history.replace('/')
   }
 
-  isAuthenticated() {
-    // Check whether the current time is past the
-    // access token's expiry time
+  isAuthed() {
+    // Check whether the current time is past the access token's expiry time
     let expiresAt = JSON.parse(localStorage.getItem('expires_at'))
-    console.log('isAuthenticated', expiresAt)
     return new Date().getTime() < expiresAt
   }
 

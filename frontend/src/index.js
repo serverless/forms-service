@@ -1,20 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { makeMainRoutes } from './routes'
+import App from './routes'
+import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import configureStore from './store'
 import './index.global.css'
 
 const mount = document.getElementById('root')
-const routes = makeMainRoutes()
+// const routes = makeMainRoutes()
 const store = configureStore()
+
+console.log('store', store)
 
 window.store = store
 
 // Main application wrapped with Redux
 const app = (
   <Provider store={store}>
-    {routes}
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </Provider>
 )
 

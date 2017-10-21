@@ -1,23 +1,14 @@
 import React, { Component } from 'react'
-// import './Profile.css'
 
 export default class Profile extends Component {
-  login() {
-    this.props.auth.login()
-  }
-  componentWillMount() {
-    this.setState({ profile: {} })
-    const { userProfile, getProfile } = this.props.auth
-    if (!userProfile) {
-      getProfile((err, profile) => {
-        this.setState({ profile })
-      })
-    } else {
-      this.setState({ profile: userProfile })
-    }
-  }
+
   render() {
-    const { profile } = this.state
+    const { profile } = this.props
+
+    if(!profile) {
+      return <div>Loading</div>
+    }
+
     return (
       <div className="profile-area">
         <h1>{profile.name}</h1>

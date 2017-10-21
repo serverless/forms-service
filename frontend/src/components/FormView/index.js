@@ -1,36 +1,48 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import axios from 'axios'
 import * as formActions from '../../redux/forms'
-import { config } from '../../_config'
 
 class FormViewContainer extends Component {
-  loadFormData = () => {
+  loadFormEntries = () => {
     const { dispatch, match } = this.props
     const id = match.params.id
-    return dispatch(formActions.getFormData(id))
+    return dispatch(formActions.getFormEntries(id)).catch((e) => {
+      console.log('nope')
+    })
   }
   componentDidMount() {
-    const { formData, match } = this.props
+    const { submissions, forms, dispatch, match } = this.props
     const formId = match.params.id
-    const submissions = formData[formId]
+    const subs = submissions[formId]
     // if no submissions or is past refresh timestamp
     // !submissions || pastRefreshTime
-    if (!submissions) {
-      this.loadFormData().then(() => {
+    console.log('forms', forms)
+    if (!forms || !forms.length) {
+      console.log('fetch form data')
+      dispatch(formActions.fetchAllFormData()).then(() => {
+        console.log('fetched form data from API')
+      }).catch((e) => {
+
+      })
+    }
+
+    if (!subs) {
+      this.loadFormEntries().then(() => {
         console.log('fetched form data from API')
       })
     }
   }
   renderSubmissions() {
-    const { formData, match } = this.props
+    const { submissions, forms, match } = this.props
+    console.log('submissions', submissions)
+    console.log('forms', forms)
     const formId = match.params.id
-    const submissions = formData[formId]
-    if (!submissions) return null
+    const subs = submissions[formId]
+    if (!subs) return null
     const sortOrder = 'desc'
     const order = sortDate('timestamp', sortOrder)
-    const submissionItems = submissions.sort(order).map((data, i) => {
+    const submissionItems = subs.sort(order).map((data, i) => {
       console.log('data', data)
       const date = formatTime(data.timestamp)
       const prettyDate = new Date(data.timestamp * 1000).toDateString()
@@ -49,15 +61,26 @@ class FormViewContainer extends Component {
         return removeFields.indexOf(key) < 0
       }).sort((a, b) => {
         // sort alpha
-        if(a < b) return -1
-        if(a > b) return 1
+        if (a < b) return -1
+        if (a > b) return 1
         return 0;
       }).map((label, n) => {
-        const value = data[label]
+        let value = data[label]
         // truncate if long text
+        if (value && typeof value === 'object') {
+          value = 'object'
+        }
 
-        // then
-        return <div key={n}>{label}: {value}</div>
+        if (value && Array.isArray(value)) {
+          value = value.join(', ')
+        }
+
+        // then render
+        return (
+          <div key={n}>
+            <b>{label}</b>: {value}
+          </div>
+        )
       })
 
       return (
@@ -77,7 +100,7 @@ class FormViewContainer extends Component {
           Back to forms list
         </Link>
         <h2>Form id: {match.params.id}</h2>
-        <button onClick={this.loadFormData}>Refresh form submissions</button>
+        <button onClick={this.loadFormEntries}>Refresh form submissions</button>
         <h3>Submissions</h3>
         {this.renderSubmissions()}
       </div>
@@ -112,7 +135,7 @@ function sortDate(field, order) {
 function mapReduxStateToProps({forms}) {
   return {
     forms: forms.forms,
-    formData: forms.formData,
+    submissions: forms.formData,
     error: forms.error
   }
 }
