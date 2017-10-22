@@ -97,19 +97,24 @@ class FormViewContainer extends Component {
   }
   render () {
     const { match, entriesError } = this.props
-    // console.log('view props', this.props)
+
+    const backButton = (
+      <Link to={`/forms/`}>
+        Back to forms list
+      </Link>
+    )
+
     if (entriesError) {
       return (
         <div>
-          Sorry dude {entriesError.message}.
+          Sorry dude {entriesError.message}.<br/><br/>
+          {backButton}
         </div>
       )
     }
     return (
       <div>
-        <Link to={`/forms/`}>
-          Back to forms list
-        </Link>
+        {backButton}
         <h2>Form id: {match.params.id}</h2>
         <button onClick={this.loadFormEntries}>Refresh form submissions</button>
         <h3>Submissions</h3>

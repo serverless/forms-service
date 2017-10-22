@@ -20,6 +20,7 @@ class App extends React.Component {
       auth.getProfile((err, profile) => {
         if (err) {
           // error with token or auth0 reset client
+          // TODO maybe just show login button again?
           return dispatch(userActions.logout())
         }
         // profile recieved from auth0, set profile
@@ -29,7 +30,7 @@ class App extends React.Component {
   }
   render () {
     const props = this.props
-    console.log('propspropspropsprops', props)
+    // console.log('propspropspropsprops', props)
 
     if (props.loading || props.location.pathname === '/callback') {
       // return <div>Loading...</div>
@@ -50,27 +51,27 @@ class App extends React.Component {
               return <div>Loading...</div>
             }
 
-            // Protected routes
-            if (props.isAuthed) {
+              // non-authed routes
+            if (!props.isAuthed) {
               return (
                 <Switch>
-                  <Route path={`/`} exact render={dashboard} />
-                  <Route path={`/forms`} exact component={FormList} />
-                  <Route path={`/forms/:id`} component={FormView} />
-                  <Route path={`/profile`} render={profile} />
+                  <Route path={`/`} exact component={Welcome} />
+                  <Route path={`/public`} exact component={PublicRoute} />
                   {/* <Redirect to={`/`} /> */}
-                  <Route component={NoMatch} />
+                  <Route component={PleaseLogin} />
                 </Switch>
               )
             }
 
-            // non-authed routes
+            // Protected routes
             return (
               <Switch>
-                <Route path={`/`} exact component={Welcome} />
-                <Route path={`/public`} exact component={PublicRoute} />
+                <Route path={`/`} exact render={dashboard} />
+                <Route path={`/forms`} exact component={FormList} />
+                <Route path={`/forms/:id`} component={FormView} />
+                <Route path={`/profile`} render={profile} />
                 {/* <Redirect to={`/`} /> */}
-                <Route component={PleaseLogin} />
+                <Route component={NoMatch} />
               </Switch>
             )
           }}
@@ -96,6 +97,7 @@ const PublicRoute = ({ location }) => (
 
 const PleaseLogin = (props) => {
   const path = props.location.pathname
+  // if known protected routes, ask for login.
   if (path.match(/profile/) || path.match(/forms/)) {
     return (
       <div>
@@ -103,6 +105,7 @@ const PleaseLogin = (props) => {
       </div>
     )
   }
+  // else show 404
   return <NoMatch {...props} />
 }
 
