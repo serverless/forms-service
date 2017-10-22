@@ -12,12 +12,11 @@ class FormViewContainer extends Component {
     })
   }
   componentDidMount() {
-    const { submissions, forms, dispatch, match } = this.props
+    const { entries, forms, dispatch, match } = this.props
     const formId = match.params.id
-    const subs = submissions[formId]
+    const subs = entries[formId]
     // if no submissions or is past refresh timestamp
     // !submissions || pastRefreshTime
-    console.log('forms', forms)
     if (!forms || !forms.length) {
       console.log('fetch form data')
       dispatch(formActions.fetchAllFormData()).then(() => {
@@ -34,12 +33,16 @@ class FormViewContainer extends Component {
     }
   }
   renderSubmissions() {
-    const { submissions, forms, match } = this.props
-    console.log('submissions', submissions)
-    console.log('forms', forms)
+    const { entries, forms, match } = this.props
+    // console.log('submissions', submissions)
+    // console.log('forms', forms)
     const formId = match.params.id
-    const subs = submissions[formId]
-    if (!subs) return null
+    const subs = entries[formId]
+    if (!subs) {
+      return (
+        <div>loading...</div>
+      )
+    }
     const sortOrder = 'desc'
     const order = sortDate('timestamp', sortOrder)
     const submissionItems = subs.sort(order).map((data, i) => {
@@ -93,7 +96,15 @@ class FormViewContainer extends Component {
     return <div>{submissionItems}</div>
   }
   render () {
-    const { match } = this.props
+    const { match, entriesError } = this.props
+    // console.log('view props', this.props)
+    if (entriesError) {
+      return (
+        <div>
+          Sorry dude {entriesError.message}.
+        </div>
+      )
+    }
     return (
       <div>
         <Link to={`/forms/`}>
@@ -135,8 +146,8 @@ function sortDate(field, order) {
 function mapReduxStateToProps({forms}) {
   return {
     forms: forms.forms,
-    submissions: forms.formData,
-    error: forms.error
+    entries: forms.entries,
+    entriesError: forms.entriesError
   }
 }
 

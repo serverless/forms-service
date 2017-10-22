@@ -22,11 +22,22 @@ export function fetchAllFormData() {
     // make api call
     return getForms().then((response) => {
       // request success
-      dispatch({
-        type: FETCH_FORMS_SUCCESS,
-        payload: response.data,
-        timestamp: Math.round(+new Date() / 1000)
-      })
+      if (response.data.length) {
+        dispatch({
+          type: FETCH_FORMS_SUCCESS,
+          payload: response.data,
+          timestamp: Math.round(+new Date() / 1000)
+        })
+      } else {
+        // dynamo returned empty array
+        // TODO fix this in api
+        dispatch({
+          type: FETCH_FORMS_ERROR,
+          error: {
+            message: 'no forms found'
+          }
+        })
+      }
       //return Promise.resolve()
     }).catch((error) => {
       // console.log('error', error) // eslint-disable-line
@@ -52,12 +63,23 @@ export function getFormEntries(formId) {
     // make api call
     return getSingleFormData(formId).then((response) => {
       // request success
-      dispatch({
-        type: FETCH_ENTRIES_SUCCESS,
-        id: formId,
-        payload: response.data,
-        timestamp: Math.round(+new Date() / 1000)
-      })
+      if (response.data.length) {
+        dispatch({
+          type: FETCH_ENTRIES_SUCCESS,
+          id: formId,
+          payload: response.data,
+          timestamp: Math.round(+new Date() / 1000)
+        })
+      } else {
+        // dynamo returned empty array
+        // TODO fix this in api
+        dispatch({
+          type: FETCH_ENTRIES_ERROR,
+          error: {
+            message: `${formId} not found`
+          }
+        })
+      }
       // return Promise.resolve();
     }).catch((error) => {
       if (error.response && error.response.status === 401) {
@@ -81,8 +103,9 @@ const initialState = {
   loading: false,
   error: null,
   forms: [],
-  formData: {},
+  entries: {},
   lastFetched: null,
+  entriesError: null,
 }
 
 export default function formsReducer(state = initialState, action) {
@@ -122,19 +145,19 @@ export default function formsReducer(state = initialState, action) {
       return {
         ...state,
         loading: false,
-        formData: {
-          ...state.formData,
+        entries: {
+          ...state.entries,
           ...obj
         },
         lastFetched: action.timestamp,
-        error: null
+        entriesError: null
       }
     // set error on ajax failure
     case FETCH_ENTRIES_ERROR:
       return {
         ...state,
         loading: false,
-        error: action.error
+        entriesError: action.error
       }
     default:
       return state
