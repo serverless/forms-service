@@ -8,17 +8,7 @@ import * as userActions from './redux/user'
 import { auth } from './redux/user'
 import { connect } from 'react-redux'
 
-const ComponentOne = ({ location }) => (
-  <div>
-    <h3>1</h3>
-  </div>
-)
 
-const ComponentTwo = ({ location }) => (
-  <div>
-    <h3>2</h3>
-  </div>
-)
 
 class App extends React.Component {
   componentWillMount() {
@@ -30,7 +20,7 @@ class App extends React.Component {
       auth.getProfile((err, profile) => {
         if (err) {
           // error with token or auth0 reset client
-          // return dispatch(userActions.logout())
+          return dispatch(userActions.logout())
         }
         // profile recieved from auth0, set profile
         return dispatch(userActions.loginSuccess(profile))
@@ -53,6 +43,7 @@ class App extends React.Component {
       <div>
         <Route path="/" render={appShell} />
         <Switch>
+          <Route path={`/about`} exact component={PublicRoute} />
           <Route {...props} render={(p) => {
             // loading state
             if (props.loading || props.location.pathname === '/callback') {
@@ -67,7 +58,8 @@ class App extends React.Component {
                   <Route path={`/forms`} exact component={FormList} />
                   <Route path={`/forms/:id`} component={FormView} />
                   <Route path={`/profile`} render={profile} />
-                  <Redirect to={`/`} />
+                  {/* <Redirect to={`/`} /> */}
+                  <Route component={NoMatch} />
                 </Switch>
               )
             }
@@ -75,18 +67,51 @@ class App extends React.Component {
             // non-authed routes
             return (
               <Switch>
-                <Route path={`/`} exact component={ComponentOne} />
-                <Route path={`/2`} exact component={ComponentTwo} />
-                <Redirect to={`/`} />
+                <Route path={`/`} exact component={Welcome} />
+                <Route path={`/public`} exact component={PublicRoute} />
+                {/* <Redirect to={`/`} /> */}
+                <Route component={PleaseLogin} />
               </Switch>
             )
           }}
           />
         </Switch>
-        {/* 404 back home */}
       </div>
     )
   }
+}
+
+const Welcome = ({ location }) => (
+  <div>
+    <h3>Welcome to the app</h3>
+  </div>
+)
+
+const PublicRoute = ({ location }) => (
+  <div>
+    <h3>About this application</h3>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae mauris arcu, eu pretium nisi. Praesent fringilla ornare ullamcorper. Pellentesque diam orci, sodales in blandit ut, placerat quis felis. Vestibulum at sem massa, in tempus nisi. Vivamus ut fermentum odio. Etiam porttitor faucibus volutpat. Vivamus vitae mi ligula, non hendrerit urna. Suspendisse potenti. Quisque eget massa a massa semper mollis.</p>
+  </div>
+)
+
+const PleaseLogin = (props) => {
+  const path = props.location.pathname
+  if (path.match(/profile/) || path.match(/forms/)) {
+    return (
+      <div>
+        <h3>You must be logged in to view this page</h3>
+      </div>
+    )
+  }
+  return <NoMatch {...props} />
+}
+
+const NoMatch = ({ location }) => {
+  return (
+    <div>
+      <h3>No match for <code>{location.pathname}</code></h3>
+    </div>
+  )
 }
 
 const stateToProps = ({ user }) => ({

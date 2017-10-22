@@ -37,50 +37,62 @@ class AppContainer extends Component {
   }
   renderNavigation() {
     const { auth, isAuthed } = this.props
+    const styles = {margin: 10}
     let loggedInNav
+
+    const publicAndPrivate = (
+      <span>
+        <Link to={`/about`} style={styles}>
+          About
+        </Link>
+      </span>
+    )
+
     if (isAuthed) {
       loggedInNav = (
-        <div style={{display: 'flex'}}>
-          <Link to={`/`}>
+        <span>
+          <Link to={`/`} style={styles}>
             Home
           </Link>
-          <Link to={`/forms/`}>
+          <Link to={`/forms/`} style={styles}>
             Forms
           </Link>
-          <Link to={`/profile/`}>
+          <Link to={`/profile/`} style={styles}>
             Profile
           </Link>
-          <Link to={`/akjdakldjlkjdlkdja/`}>
+          <Link to={`/akjdakldjlkjdlkdja/`} style={styles}>
             404 link
           </Link>
-          <button className="btn-margin" onClick={auth.logout}>
+          <button className="btn-margin" onClick={auth.logout} style={styles}>
             Log Out
           </button>
-        </div>
+          <br/><br/><button onClick={this.simulateNoAuth}>Simulate no auth</button>
+        </span>
       )
     }
     let loggedOutNav
     if (!isAuthed) {
       loggedOutNav = (
-        <div>
-          <button className="btn-margin" onClick={this.logIn}>
+        <span>
+          <button className="btn-margin" onClick={this.logIn} style={styles}>
             Log In
           </button>
-          <Link to={`/profile/`}>
+          <Link to={`/profile/`} style={styles}>
             Profile (protected)
           </Link>
-          <Link to={`/lsdkakdllakd/`}>
+          <Link to={`/lsdkakdllakd/`} style={styles}>
             404 link
           </Link>
-        </div>
+        </span>
       )
     }
 
     return (
       <div>
+        {publicAndPrivate}
         {loggedInNav}
         {loggedOutNav}
-        <button onClick={this.simulateNoAuth}>Simulate no auth</button>
+        <br/><br/>
       </div>
     )
   }
