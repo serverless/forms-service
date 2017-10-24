@@ -47,7 +47,7 @@ export default class Auth {
     console.log(authResult);
     console.log('authResult', authResult)
     console.log(authResult.state)
-    debugger
+    // debugger
     const token = getXsrfToken()
     const state = queryString.parse(authResult.state)
     console.log('state', state)
@@ -60,6 +60,20 @@ export default class Auth {
       return false
     }
     if (authResult && authResult.accessToken && authResult.idToken) {
+
+      const role = this.getRole(authResult.idToken)
+
+      if (!role) {
+        alert('Roles not used in app. Update auth0 rules')
+        return false
+      }
+
+
+      if (!role.length || !this.isAdmin(role)) {
+        alert('Sorry you are not an admin of this app! Please contact admin')
+        // no role
+        return false
+      }
       // Set the time that the access token will expire at
       const expiresAt = JSON.stringify(
         authResult.expiresIn * 1000 + new Date().getTime()
@@ -114,4 +128,20 @@ export default class Auth {
     return new Date().getTime() < expiresAt;
   }
 
+  isAdmin(rolesArray) {
+    return rolesArray.indexOf('admin') > -1
+  }
+
+  getRole(token) {
+    const namespace = 'https://serverless.com'
+    const idToken = token || localStorage.getItem('id_token')
+    if (!idToken) {
+      return null
+    }
+    console.log('yes')
+    const decoded = decode(idToken)
+    console.log('decode', decoded)
+    console.log(typeof decoded)
+    return decode(idToken)[`${namespace}/roles`] || null
+  }
 }
