@@ -44,8 +44,11 @@ function sanitizeObject(obj) {
   return array.reduce((done, curr, i, keys) => {
      const key = keys[i]
      const item = obj[key]
-     // default return bool/numbers
-     done[key] = item
+
+     // remove empty strings
+     if (item) {
+      done[key] = item
+     }
 
      if (isArray(item)) {
        // recurse
@@ -55,7 +58,7 @@ function sanitizeObject(obj) {
        done[key] = sanitizeObject(item)
      }
      // do the sanitizing
-     if (typeof item === 'string') {
+     if (item && typeof item === 'string') {
        done[key] = xssFilters.inHTMLData(item)
      }
      // return clean values
