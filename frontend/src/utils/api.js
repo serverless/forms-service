@@ -17,7 +17,7 @@ export function getForms() {
     method: 'post',
     url: config.api.forms,
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`
+      Authorization: `Bearer ${localStorage.getItem('id_token')}`
     },
     // validateStatus: (status) => {
     //   return status < 500; // Reject only if the status code is greater than or equal to 500
@@ -35,7 +35,7 @@ export function getSingleFormData(formId) {
       formId: formId
     },
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`
+      Authorization: `Bearer ${localStorage.getItem('id_token')}`
     },
     // validateStatus: (status) => {
     //   return status < 500; // Reject only if the status code is greater than or equal to 500

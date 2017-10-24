@@ -8,7 +8,11 @@ import * as userActions from './redux/user'
 import { auth } from './redux/user'
 import { connect } from 'react-redux'
 
-
+const handleAuthentication = (nextState, replace) => {
+  if (/access_token|id_token|error/.test(nextState.location.hash)) {
+    auth.handleAuthentication()
+  }
+}
 
 class App extends React.Component {
   componentWillMount() {
@@ -16,8 +20,11 @@ class App extends React.Component {
   }
   loadProfile = () => {
     const { isAuthed, dispatch } = this.props
+    console.log('load profile', auth)
     if (isAuthed) {
+      console.log('isAuthed, isAuthed')
       auth.getProfile((err, profile) => {
+        console.log('args', arguments)
         if (err) {
           // error with token or auth0 reset client
           // TODO maybe just show login button again?
@@ -44,6 +51,11 @@ class App extends React.Component {
       <div>
         <Route path="/" render={appShell} />
         <Switch>
+          <Route path="/callback" render={(props) => {
+              // parse auth hash
+              handleAuthentication(props)
+              return <div>loading callback</div>
+          }} />
           <Route path={`/about`} exact component={PublicRoute} />
           <Route {...props} render={(p) => {
             // loading state

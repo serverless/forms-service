@@ -1,6 +1,5 @@
 import Auth from '../utils/auth'
 
-
 export const auth = new Auth()
 
 const isClient = typeof window !== 'undefined'

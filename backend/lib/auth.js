@@ -58,18 +58,18 @@ module.exports = (event, context, callback) => {
   // Get Signing key
   authClient.getSigningKey(kid, (signError, key) => {
     if (signError) {
-      console.log('kid mismatch')
+      console.log('kid mismatch', signError)
       errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] kid mismatch`)
       return callback(errorMsg)
     }
     console.log('key', key)
     const signingKey = key.publicKey || key.rsaPublicKey
     const opts = {
-      audience: process.env.AUTH0_CLIENT_ID,
+      // audience: process.env.AUTH0_CLIENT_ID,
       // Why RSA? http://bit.ly/2xAYygk
       algorithms: alg
     }
-
+    console.log('opts', opts)
     try {
       jwt.verify(tokenValue, signingKey, opts, (verifyError, decoded) => {
 
