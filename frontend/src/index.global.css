@@ -2,12 +2,12 @@ html, body {
   height: 100%;
 }
 body {
-  background: linear-gradient(45deg, #6fc7b5 0%, #13bdce 20%, #0094d9 40%, #5a3694 60%, #ee4d74 80%, #f58c58 100%);
+  /* background: linear-gradient(45deg, #6fc7b5 0%, #13bdce 20%, #0094d9 40%, #5a3694 60%, #ee4d74 80%, #f58c58 100%);
   background-size: 600%;
   background-position: 0% 100%;
   animation: gradient 7.5s ease-in-out infinite;
   position: absolute;
-  left: 0;
+  left: 0; */
 }
 @keyframes gradient{
   50%{

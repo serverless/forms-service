@@ -69,13 +69,17 @@ class FormViewContainer extends Component {
         return 0;
       }).map((label, n) => {
         let value = data[label]
-        // truncate if long text
-        if (value && typeof value === 'object') {
-          value = 'object'
-        }
 
-        if (value && Array.isArray(value)) {
+        if (!value) {
+          return null
+        }
+        // truncate if long text
+        if (Array.isArray(value)) {
           value = value.join(', ')
+        } else if (typeof value === 'object') {
+          value = Object.keys(value).map((key) => {
+            return `${key}: ${value[key]}`
+          }).join(', ')
         }
 
         // then render
