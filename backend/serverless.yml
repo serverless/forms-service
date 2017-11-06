@@ -1,6 +1,9 @@
 # 'service' is the name of the service
 service: ${self:custom.projectName}-form-service
 
+plugins:
+  - serverless-stack-output
+
 # 'custom' is a place to define custom variables used elsewhere in the yaml config
 custom:
   defaultStage: prod
@@ -9,6 +12,9 @@ custom:
   currentRegion: ${file(./config.${self:custom.currentStage}.json):region}
   formsTable: ${self:custom.projectName}-${self:custom.currentStage}-forms
   entriesTable: ${self:custom.projectName}-${self:custom.currentStage}-form-entries
+  output:
+    handler: postDeploy.handler
+    file: .serverless/manifest.json
 
 # 'provider' specifies where to deploy the service. Aka deploy to 'aws'
 provider:
@@ -96,7 +102,7 @@ resources:
         ResponseType: EXPIRED_TOKEN
         RestApiId:
           Ref: 'ApiGatewayRestApi'
-        StatusCode: '401'    
+        StatusCode: '401'
     FormsTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -137,3 +143,13 @@ resources:
         #   ProvisionedThroughput:
         #     ReadCapacityUnits: 1
         #     WriteCapacityUnits: 1
+  Outputs:
+    Testing:
+      Value: { "Fn::Join" : ["", [ "https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}" ] ]  }
+    # ExampleUserKey:
+    #   Value:
+    #     Ref: ExampleUserKey
+    # ExampleUserSecret:
+    #   Value: {"Fn::GetAtt": ["ExampleUserKey", "SecretAccessKey"]}
+    ExampleStaticValue:
+      Value: example-static-value
