@@ -24,6 +24,7 @@ export default class Auth {
     const location = encodeURIComponent(window.location.href)
     const state = `token=${token}&url=${location}`
     console.log('state', state)
+    debugger;
     this.auth0.authorize({
       state: state
     })
@@ -31,6 +32,14 @@ export default class Auth {
 
   handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
+
+      if (err) {
+        console.log('err', err)
+        alert(JSON.stringify((err)))
+        console.log('authResult', authResult)
+        debugger;
+      }
+
       if (authResult && authResult.accessToken && authResult.idToken) {
         //console.log('authResult', authResult)
         this.setSession(authResult)
@@ -51,6 +60,9 @@ export default class Auth {
     const token = getXsrfToken()
     const state = queryString.parse(authResult.state)
     console.log('state', state)
+    console.log('state.token', state.token)
+    console.log('token', token)
+    debugger
     if (state.token !== token) {
       // reset token
       clearXsrfToken()
