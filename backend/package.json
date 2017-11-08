@@ -9,9 +9,9 @@
   "author": "David Wells",
   "license": "MIT",
   "dependencies": {
+    "@sendgrid/mail": "^6.1.4",
     "jsonwebtoken": "^8.0.1",
     "jwks-rsa": "^1.2.0",
-    "sendgrid": "^5.2.3",
     "xss-filters": "^1.2.7"
   },
   "devDependencies": {

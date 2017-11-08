@@ -1,5 +1,5 @@
-const sendGrid = require('sendgrid')
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 module.exports = function sendEmail(to, formData, callback) {
 
@@ -15,21 +15,21 @@ module.exports = function sendEmail(to, formData, callback) {
 </body>
 </html>
 `
-  const helper = sendGrid.mail
-  const fromEmail = new helper.Email('contact@serverless.com')
-  const toEmail = new helper.Email(to)
+
+  const fromEmail = 'contact@serverless.com'
+  const replyTo = formData.email || 'no-reply@serverless.com'
   const subject = `New submission on form ${formData.formId}`
-  const content = new helper.Content("text/html", emailContent)
-  const mail = new helper.Mail(fromEmail, subject, toEmail, content)
 
-  const sg = sendGrid(SENDGRID_API_KEY)
-  const request = sg.emptyRequest({
-    method: 'POST',
-    path: '/v3/mail/send',
-    body: mail.toJSON()
-  })
+  console.log('to', to)
 
-  sg.API(request, function (error, response) {
+  const msg = {
+    to: to,
+    from: fromEmail,
+    replyTo: replyTo,
+    subject: subject,
+    html: emailContent,
+  }
+  sgMail.sendMultiple(msg, function (error, response) {
     if (error) {
       console.log('Sendgrid error response received', error)
     }
