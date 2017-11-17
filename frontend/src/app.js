@@ -8,7 +8,9 @@ import * as userActions from './redux/user'
 import { auth } from './redux/user'
 import { connect } from 'react-redux'
 
+var count = 0
 const handleAuthentication = (nextState, replace) => {
+  console.log('handleAuthentication route count', count + 1)
   if (/access_token|id_token|error/.test(nextState.location.hash)) {
     auth.handleAuthentication()
   }

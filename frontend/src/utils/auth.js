@@ -31,8 +31,10 @@ export default class Auth {
   }
 
   handleAuthentication() {
+    var count = 0
     this.auth0.parseHash((err, authResult) => {
-
+      console.log('auth0.parseHash ran')
+      console.log('auth0.parseHash count', count + 1)
       if (err) {
         console.log('err', err)
         alert(JSON.stringify((err)))

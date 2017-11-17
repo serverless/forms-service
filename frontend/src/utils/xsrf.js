@@ -15,6 +15,7 @@ export function initializeXsrfToken() {
 }
 
 export function clearXsrfToken() {
+  console.log('clear token')
   return localStorage.removeItem(XSRF_TOKEN_KEY)
 }
 

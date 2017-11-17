@@ -4,10 +4,10 @@ import { config } from '../_config'
 
 const AUTH_CONFIG = config.auth0
 
-export default function lockInstance() {
+export default function WebAuth() {
   // set csrf token
   const token = initializeXsrfToken()
-  // https://auth0.com/docs/libraries/lock/v10/customization
+  console.log('Initialize auth0.WebAuth')
   return new auth0.WebAuth({
     domain: AUTH_CONFIG.domain,
     clientID: AUTH_CONFIG.clientId,
