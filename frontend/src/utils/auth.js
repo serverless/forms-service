@@ -20,13 +20,14 @@ export default class Auth {
   }
 
   login() {
-    const token = getXsrfToken()
     const location = encodeURIComponent(window.location.href)
-    const state = `token=${token}&url=${location}`
-    console.log('state', state)
-    debugger;
+    const appState = {
+      location: location,
+      // and any other state that you might want to store
+    }
+    // debugger;
     this.auth0.authorize({
-      state: state
+      appState: appState
     })
   }
 
@@ -34,10 +35,8 @@ export default class Auth {
     var count = 0
     console.log('auth0.parseHash ran')
     console.log('auth0.parseHash count', count + 1)
-    alert(`parseHash called cound ${count + 1}`)
 
     this.auth0.parseHash((err, authResult) => {
-
       if (err) {
         console.log('err', err)
         alert(JSON.stringify((err)))
@@ -58,22 +57,19 @@ export default class Auth {
   }
 
   setSession(authResult) {
-    console.log(authResult);
     console.log('authResult', authResult)
-    console.log(authResult.state)
+    console.log(authResult.appState)
+    if (authResult && authResult.appState) {
+      console.log(typeof authResult.appState)
+    }
     // debugger
-    const token = getXsrfToken()
-    const state = queryString.parse(authResult.state)
-    console.log('state', state)
-    console.log('state.token', state.token)
-    console.log('token', token)
-    debugger
     if (state.token !== token) {
       // reset token
       clearXsrfToken()
       alert('Your Security token expired. Please login again')
       // redirect to previous page
-      window.location.href = state.url
+      // window.location.href = state.url
+      history.replace('/')
       return false
     }
     if (authResult && authResult.accessToken && authResult.idToken) {
