@@ -63,15 +63,15 @@ export default class Auth {
       console.log(typeof authResult.appState)
     }
     // debugger
-    if (state.token !== token) {
-      // reset token
-      clearXsrfToken()
-      alert('Your Security token expired. Please login again')
-      // redirect to previous page
-      // window.location.href = state.url
-      history.replace('/')
-      return false
-    }
+    // if (state.token !== token) {
+    //   // reset token
+    //   clearXsrfToken()
+    //   alert('Your Security token expired. Please login again')
+    //   // redirect to previous page
+    //   // window.location.href = state.url
+    //   history.replace('/')
+    //   return false
+    // }
     if (authResult && authResult.accessToken && authResult.idToken) {
 
       const role = this.getRole(authResult.idToken)
