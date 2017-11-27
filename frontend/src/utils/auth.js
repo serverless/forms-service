@@ -8,6 +8,8 @@ import { getXsrfToken, clearXsrfToken } from './xsrf'
 
 const AUTH_CONFIG = config.auth0
 
+console.log('AUTH_CONFIG', AUTH_CONFIG)
+
 export default class Auth {
   auth0 = lockInstance();
 
@@ -20,9 +22,11 @@ export default class Auth {
   }
 
   login() {
+    const token = getXsrfToken()
     const location = encodeURIComponent(window.location.href)
     const appState = {
       location: location,
+      token: token
       // and any other state that you might want to store
     }
     // debugger;
