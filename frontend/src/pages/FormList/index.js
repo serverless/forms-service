@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import timeAgo from 'time-ago'
+import AppLayout from '../../fragments/AppLayout'
+import { capitalizeWords } from '../FormView'
 import * as formActions from '../../redux/forms'
 import * as userActions from '../../redux/user'
 
@@ -39,16 +42,53 @@ class FormListContainer extends Component {
     console.log()
     if (!forms) return null
     const formListItems = forms.map((form, i) => {
-      console.log('form', form)
+      const updatedAt = timeAgo.ago(form.updated * 1000)
+      let notifications
+      if (form.notify && form.notify.length) {
+        const personText = (form.notify.length === 1) ? 'person' : 'people'
+        const peopleList = form.notify.join(', ')
+        notifications = (
+          <div className='forms-list-item-metric people-notified' title={peopleList}>
+            <div className='forms-list-item-label'>
+              Form response sent to
+            </div>
+            <div className='forms-list-item-value'>
+              {form.notify.length} {personText}
+            </div>
+          </div>
+        )
+      }
+
       return (
-        <li key={i}>
-          <Link to={`/forms/${form.formId}`}>
-            {form.formId} - {form.submissionCount}
-          </Link>
-        </li>
+        <Link key={i} to={`/forms/${form.formId}`}  className='forms-list-item'>
+          <div className='forms-list-item-title'>
+            {capitalizeWords(form.formId.split("-").join(" "))}
+          </div>
+          <div className='forms-list-item-metric submission-count'>
+            <div className='forms-list-item-label'>
+              submissions
+            </div>
+            <div className='forms-list-item-value'>
+              {form.submissionCount}
+            </div>
+          </div>
+          <div className='forms-list-item-metric last-conversion'>
+            <div className='forms-list-item-label'>
+              last conversion
+            </div>
+            <div className='forms-list-item-value'>
+              {updatedAt}
+            </div>
+          </div>
+          {notifications}
+        </Link>
       )
     })
-    return <ul>{formListItems}</ul>
+    return (
+      <div className='forms-list'>
+        {formListItems}
+      </div>
+    )
   }
   render() {
     const { loading, error, lastFetched } = this.props
@@ -74,13 +114,20 @@ class FormListContainer extends Component {
     }
 
     return (
-      <div className="App">
+      <AppLayout>
         <div className="App-intro">
-          <h1>Forms</h1>
-          <button onClick={this.loadForms}>Refresh form list</button>
+          <h1 className='page-title'>
+            Forms
+            <span
+              className='refresh-button'
+              title='refresh form list'
+              onClick={this.loadForms}>
+              🔄
+            </span>
+          </h1>
           {formsList}
         </div>
-      </div>
+      </AppLayout>
     )
   }
 }

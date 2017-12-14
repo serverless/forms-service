@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import AppLayout from '../../fragments/AppLayout'
 import * as formActions from '../../redux/forms'
 
 class FormViewContainer extends Component {
@@ -53,7 +54,9 @@ class FormViewContainer extends Component {
       let header
       if (data.email) {
         header = (
-          <div>{data.email} - {prettyDate} - {date}</div>
+          <div className='form-entry-header'>
+            <b>{data.email}</b> completed form on {prettyDate}
+          </div>
         )
       }
 
@@ -84,16 +87,20 @@ class FormViewContainer extends Component {
 
         // then render
         return (
-          <div key={n}>
+          <div key={`${label}-${n}`} className='form-entry-field'>
             <b>{label}</b>: {value}
           </div>
         )
       })
 
       return (
-        <div key={i} style={{borderBottom: '1px solid'}}>
-          {header}
-          {fields}
+        <div key={i} className='form-entry-wrapper'>
+          <div className='form-entry'>
+            {header}
+            <div className='form-entry-content'>
+              {fields}
+            </div>
+          </div>
         </div>
       )
     })
@@ -117,15 +124,31 @@ class FormViewContainer extends Component {
       )
     }
     return (
-      <div>
+      <AppLayout>
         {backButton}
-        <h2>Form id: {match.params.id}</h2>
-        <button onClick={this.loadFormEntries}>Refresh form submissions</button>
+        <h1 className='page-title'>
+          {capitalizeWords(match.params.id.split("-").join(" "))} Form
+          <span
+            className='refresh-button'
+            title='refresh form list'
+            onClick={this.loadFormEntries}>
+            🔄
+          </span>
+        </h1>
+
         <h3>Submissions</h3>
-        {this.renderSubmissions()}
-      </div>
+        <div className='card-block'>
+          {this.renderSubmissions()}
+        </div>
+      </AppLayout>
     )
   }
+}
+
+export function capitalizeWords(str) {
+ return str.replace(/\w\S*/g, (txt) => {
+   return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+ })
 }
 
 function formatTime(timestamp) {

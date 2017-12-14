@@ -1,19 +1,130 @@
 html, body {
   height: 100%;
+  margin: 0px;
+  padding: 0px;
+  background: #e2e7f1;
+  font-family: 'Open Sans', sans-serif;
 }
-body {
-  /* background: linear-gradient(45deg, #6fc7b5 0%, #13bdce 20%, #0094d9 40%, #5a3694 60%, #ee4d74 80%, #f58c58 100%);
-  background-size: 600%;
-  background-position: 0% 100%;
-  animation: gradient 7.5s ease-in-out infinite;
-  position: absolute;
-  left: 0; */
+.navbar, .navbar-spacer {
+  height: 65px;
+  width: 100%;
 }
-@keyframes gradient{
-  50%{
-    background-position: 100% 0%;
-  }
+.navbar {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  left: 0;
+  top: 0;
+  background: #1c4cc3;
+  color: #fff;
+  z-index: 9;
 }
-.App {
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+}
+.logo {
+  font-size: 25px;
+  margin-right: 30px;
+}
+.left-nav, .right-nav  {
+  display: flex;
+  align-items: center;
+}
+.left-nav {
+  padding-left: 20px;
+}
+.right-nav {
+  padding-right: 20px;
+}
+.layout {
+  padding: 0 30px;
+}
+.page-title {
+  display: flex;
+  align-items: center;
+}
+.refresh-button {
+  cursor: pointer;
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 22px;
+}
 
+/** Form List View **/
+
+.forms-list {
+  margin-top: 20px;
+}
+.forms-list-item {
+  padding: 14.4px 17.6px;
+  box-shadow: 0px 2px 5px rgba(69, 101, 173, 0.1);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  background: #fff;
+  margin-bottom: 20px;
+  display: block;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: #333;
+}
+.forms-list-item:hover {
+  /*transform: translateY(-3px);*/
+  background: #f9f9f9;
+  box-shadow: 0px 0px 0px 2px #047bf8;
+}
+.forms-list-item-title {
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 300px;
+  max-width: 300px;
+  padding-left: 10px;
+}
+.forms-list-item-metric {
+  padding: 0 30px;
+}
+.forms-list-item-label {
+  font-size: 10px;
+}
+.forms-list-item-label, .forms-list-item-value {
+  text-align: center;
+}
+.forms-list-item-value {
+  font-size: 26px;
+}
+.last-conversion {
+  min-width: 160px;
+}
+
+
+/** Single Form View **/
+
+.form-entry-wrapper {
+  box-shadow: 0px 2px 4px rgba(126, 142, 177, 0.12);
+  margin-bottom: 20px;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+.form-entry-wrapper:hover {
+  box-shadow: 0px 0px 0px 2px #047bf8;
+  /*transform: translateY(-3px);*/
+  cursor: pointer;
+}
+.form-entry {
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.05);
+}
+.form-entry-header {
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.form-entry-content {
+  padding: 20px;
+}
+.form-entry-field {
+  margin-bottom: 3px;
 }

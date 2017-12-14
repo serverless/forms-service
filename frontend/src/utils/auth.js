@@ -8,8 +8,6 @@ import { getXsrfToken, clearXsrfToken } from './xsrf'
 
 const AUTH_CONFIG = config.auth0
 
-console.log('AUTH_CONFIG', AUTH_CONFIG)
-
 export default class Auth {
   auth0 = lockInstance();
 
@@ -31,7 +29,8 @@ export default class Auth {
     }
     // debugger;
     this.auth0.authorize({
-      appState: appState
+      appState: appState,
+      redirectUri: `${window.location.origin}/callback`,
     })
   }
 
@@ -51,7 +50,6 @@ export default class Auth {
       if (authResult && authResult.accessToken && authResult.idToken) {
         //console.log('authResult', authResult)
         this.setSession(authResult)
-        history.replace('/')
       } else if (err) {
         history.replace('/')
         console.log(err)
@@ -161,4 +159,14 @@ export default class Auth {
     console.log(typeof decoded)
     return decode(idToken)[`${namespace}/roles`] || null
   }
+}
+
+
+export function simulateNoAuth() {
+  console.log('Mangling JWTs')
+  // Break JWT for testing purposes
+  const access = localStorage.getItem('access_token')
+  const idToken = localStorage.getItem('id_token')
+  localStorage.setItem('access_token', `x${access}`)
+  localStorage.setItem('id_token', `x${idToken}`)
 }

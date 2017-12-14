@@ -1,16 +1,17 @@
 import React, { Component } from 'react'
+import AppLayout from '../../fragments/AppLayout'
 
 export default class Profile extends Component {
 
   render() {
     const { profile } = this.props
 
-    if(!profile) {
+    if (!profile) {
       return <div>Loading</div>
     }
 
     return (
-      <div className="profile-area">
+      <AppLayout>
         <h1>{profile.name}</h1>
         <div>
           <img src={profile.picture} alt="profile" />
@@ -18,9 +19,11 @@ export default class Profile extends Component {
             Nickname
             <h3>{profile.nickname}</h3>
           </div>
-          <pre>{JSON.stringify(profile, null, 2)}</pre>
+          <pre>
+            {JSON.stringify(profile, null, 2)}
+          </pre>
         </div>
-      </div>
+      </AppLayout>
     )
   }
 }

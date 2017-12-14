@@ -7,7 +7,6 @@ export const config = {
   auth0: {
     domain: 'serverlessqa.auth0.com',
     clientId: '92uOHMc6ndhp4lElK1UI0AIkuw7jQIlb',
-    //apiUrl: 'throwaway',
     callbackUrl: (isDev) ? 'http://localhost:3000/callback' : 'https://serverless-forms.netlify.com/callback'
   },
   // api endpoints
