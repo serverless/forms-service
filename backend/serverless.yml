@@ -9,7 +9,7 @@ custom:
   defaultStage: prod
   currentStage: ${opt:stage, self:custom.defaultStage}
   projectName: ${file(./config.${self:custom.currentStage}.json):projectName}
-  currentRegion: ${file(./config.${self:custom.currentStage}.json):region}
+  currentRegion: ${opt:region, "us-west-2"}
   formsTable: ${self:custom.projectName}-${self:custom.currentStage}-forms
   entriesTable: ${self:custom.projectName}-${self:custom.currentStage}-form-entries
   output:
