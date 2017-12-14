@@ -53,11 +53,6 @@ provider:
 functions:
   auth:
     handler: handler.auth
-    events:
-      - http:
-          path: auth
-          method: post
-          cors: true
   handleFormEntry:
     handler: handler.handleFormEntry
     events:

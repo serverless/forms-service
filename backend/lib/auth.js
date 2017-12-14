@@ -1,141 +1,143 @@
+/*
+  Custom Authorizer for token based requested
+*/
+const util = require('util')
 const jwt = require('jsonwebtoken')
 const jwksClient = require('jwks-rsa')
+// const arnUtils = require('./utils/arnUtils')
 const auth0Domain = process.env.AUTH0_DOMAIN
 const authClient = jwksClient({
   cache: true,
   jwksUri: `https://${auth0Domain}/.well-known/jwks.json`,
 })
 
-/*
- * JWT Authorization for custom authorizers AND http events
- * TODO set cors https://github.com/awslabs/aws-apigateway-importer/issues/195#issuecomment-332957858
-https://github.com/auth0-samples/jwt-rsa-aws-custom-authorizer/blob/93fdd9c1d33d591a37ee56358f600839b33ff505/lib.js#L41
- * https://medium.com/statup/statups-workaround-long-term-solution-to-an-aws-cors-issue-68d0b68555db
- */
 module.exports = (event, context, callback) => {
-  console.log('event', event)
-  let errorMsg
-  const isAuthorizer = event.authorizationToken
 
-  const authToken = event.authorizationToken || event.headers.Authorization
+  if (!event.authorizationToken) {
+    console.log('event.authorizationToken missing')
+    return callback('Unauthorized')
+  }
+
+  const authToken = event.authorizationToken.substring(7) // remove "bearer " word from token
+  const alg = 'RS256' // algorithm is RSA http://bit.ly/2xAYygk
+
   if (!authToken) {
-    errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] No authorizationToken found`)
-    return callback(errorMsg)
+    console.log('401 Unauthorized no jwt token')
+    return callback('Unauthorized')
   }
-  console.log('authToken', authToken)
-  const tokenParts = authToken.split(' ')
-  const tokenValue = tokenParts[1]
-  const alg = 'RS256'
-  if (!(tokenParts[0].toLowerCase() === 'bearer' && tokenValue)) {
-    // 401 Unauthorized
-    errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] No bearer authorization token found.`)
-    return callback(errorMsg)
-  }
-  console.log('tokenValue', tokenValue)
-  var decodedToken
 
+  // Validate Token is not malformed. AKA fail fail
+  let decodedToken
   try {
-    decodedToken = jwt.decode(tokenValue, { complete: true })
+    decodedToken = jwt.decode(authToken, { complete: true })
    } catch (err) {
-    console.log('Invalid token', err)
-    errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] token malformed`)
-    return callback(errorMsg)
+    console.log('jwt token malformed', err)
+    return callback('Unauthorized')
   }
+
   // if token empty
   if (!decodedToken) {
-    console.log('token empty')
-    errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] token malformed`)
-    return callback(errorMsg)
+    console.log('null token on user exit')
+    return callback('Unauthorized')
   }
 
+  // Get Signing key from auth0
   const kid = decodedToken.header.kid
-  if (decodedToken.header.alg !== alg) {
-    console.log('incorrect algorithm')
-    // we are only supporting RS256 so fail if this happens.
-    errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] token malformed`)
-    return callback(errorMsg)
-  }
-  // Get Signing key
   authClient.getSigningKey(kid, (signError, key) => {
     if (signError) {
-      console.log('kid mismatch', signError)
-      errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] kid mismatch`)
-      return callback(errorMsg)
+      console.log('signing key error', signError)
+      return callback('Unauthorized')
     }
-    console.log('key', key)
     const signingKey = key.publicKey || key.rsaPublicKey
     const opts = {
-      // audience: process.env.AUTH0_CLIENT_ID,
-      // Why RSA? http://bit.ly/2xAYygk
-      algorithms: alg
+      algorithms: alg // algorithm is RSA http://bit.ly/2xAYygk
     }
-    console.log('opts', opts)
+    // Now Verify the jwt token is valid
     try {
-      jwt.verify(tokenValue, signingKey, opts, (verifyError, decoded) => {
-
+      jwt.verify(authToken, signingKey, opts, (verifyError, decoded) => {
         if (verifyError) {
-          console.log('verifyError', verifyError)
-          // 401 Unauthorized
-          console.log(`Token invalid. ${verifyError}`)
-          errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] Token invalid. ${verifyError}`)
-          return callback(errorMsg)
+          console.log('Token signature NOT VERIFIED', verifyError)
+          return callback('Unauthorized')
         }
-        // is custom authorizer function
-        if (event.authorizationToken) {
-          console.log('valid from customAuthorizer', decoded)
-          return callback(null, generatePolicy(decoded.sub, 'Allow', event.methodArn));
-        }
+        // output for logs
+        console.log('------------------')
+        console.log('decoded jwt token')
+        console.log(decoded)
+        console.log('------------------')
+
+        /* if you want to allow only verified emails use this */
         // if (!decoded.email_verified) {
+        //   console.log('User has not verified email yet', decoded)
         //   return callback(verifyError)
         // }
 
-        // is http triggered function
-        console.log('valid from http-post', decoded)
-        return callback(null, {
-          statusCode: 200,
-          body: JSON.stringify({
-            decoded: decoded,
-          })
-        })
+        /* Does role match? */
+        const roles = decoded['https://serverless.com/roles']
+        if (!roles || !roles.length || !roles.includes('admin')) {
+          console.log(`User ${decoded.sub} is not an admin`)
+          console.log(`User ${decoded.sub} current roles:`, roles)
+          return callback('Unauthorized')
+        }
+
+        // Generate IAM policy to access function
+        const IAMPolicy = generatePolicy(decoded.sub, 'Allow', event.methodArn)
+        console.log('IAMPolicy:')
+        console.log(util.inspect(IAMPolicy, false, null))
+        console.log('------------------')
+        // Return the policy
+        return callback(null, IAMPolicy)
+
       })
      } catch (err) {
-      console.log('catch error. Invalid token', err)
-      errorMsg = (isAuthorizer) ? 'Unauthorized' : new Error(`[401] Token invalid. ${err.message}`)
-      return callback(errorMsg)
+      console.log('jwt.verify exception', err)
+      return callback('Unauthorized')
     }
   })
 }
-// http://docs.aws.amazon.com/apigateway/latest/developerguide/use-custom-authorizer.html
-// Policy helper function
+
+
+/*
+  We need to generate an IAM policy that will allow invocation of a functionName
+
+  The resource looks like:
+
+  Format:
+
+  arn:aws:execute-api:<region>:<account_id>:<restapi_id>/<stage>/<httpVerb>/<path>
+
+  Like so:
+
+  arn:aws:execute-api:us-west-2:31241241223:d3ul21vxig/prod/POST/get-forms
+
+ */
 function generatePolicy (principalId, effect, resource) {
   let authResponse = {}
+
+  // set User ID
   authResponse.principalId = principalId
+
+  // Add Allow/Deny IAM Statements
   if (effect && resource) {
-    let policyDocument = {}
-    policyDocument.Version = '2012-10-17'
-    policyDocument.Statement = []
-    let statementOne = {}
-    statementOne.Action = 'execute-api:Invoke'
-    statementOne.Effect = effect
-    statementOne.Resource = resource
-    policyDocument.Statement[0] = statementOne
+    const statementOne = {
+      Action: 'execute-api:Invoke',
+      Effect: effect,
+      Resource: resource,
+    }
+
+    const policyDocument = {
+      Version: '2012-10-17',
+      Statement: [
+        statementOne
+      ]
+    }
+
     authResponse.policyDocument = policyDocument
   }
-  // add additional context for next function to consume
+  // optionally add additional context for next function to consume
   authResponse.context = {
     "stringKey": "stringval",
     "numberKey": 123,
     "booleanKey": true
   }
-
   return authResponse
 }
-
-//  cookieString('myCookie', 'abc123', 60 * 60 * 24, event.headers.Host),
-function cookieString(key, value, maxAge, domain, secure) {
-  let cookieStr = `${key}=${value}; Max-Age=${maxAge}; Domain=${domain.split(':')[0]}; HttpOnly;`;
-  if (secure) {
-    cookieStr += ' Secure;';
-  }
-  return cookieStr;
-};

@@ -1,5 +1,5 @@
 /**
- * Form Service
+ * Serverless Form Service
  */
 
 /* custom authorizer */
