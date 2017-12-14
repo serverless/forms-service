@@ -6,7 +6,6 @@
     "auth0-js": "^8.11.3",
     "axios": "^0.16.2",
     "jwt-decode": "^2.2.0",
-    "query-string": "^5.0.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",

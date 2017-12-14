@@ -1,6 +1,4 @@
-import auth0 from 'auth0-js'
-import lockInstance from './authInstance'
-import queryString from 'query-string'
+import auth0Instance from './authInstance'
 import decode from 'jwt-decode'
 import history from './history'
 import { config } from '../_config'
@@ -9,7 +7,7 @@ import { getXsrfToken, clearXsrfToken } from './xsrf'
 const AUTH_CONFIG = config.auth0
 
 export default class Auth {
-  auth0 = lockInstance();
+  auth0 = auth0Instance();
 
   constructor() {
     this.login = this.login.bind(this)
@@ -35,16 +33,15 @@ export default class Auth {
   }
 
   handleAuthentication() {
-    var count = 0
-    console.log('auth0.parseHash ran')
-    console.log('auth0.parseHash count', count + 1)
-
     this.auth0.parseHash((err, authResult) => {
       if (err) {
         console.log('err', err)
-        alert(JSON.stringify((err)))
-        console.log('authResult', authResult)
-        debugger;
+        const errMsg = `Sorry an error occured.
+
+${JSON.stringify((err))}
+
+Make sure you are using https`
+        alert(errMsg)
       }
 
       if (authResult && authResult.accessToken && authResult.idToken) {
@@ -60,11 +57,6 @@ export default class Auth {
 
   setSession(authResult) {
     console.log('authResult', authResult)
-    console.log(authResult.appState)
-    if (authResult && authResult.appState) {
-      console.log(typeof authResult.appState)
-    }
-    // debugger
     // if (state.token !== token) {
     //   // reset token
     //   clearXsrfToken()

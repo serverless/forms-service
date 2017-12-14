@@ -4,21 +4,14 @@ import * as userActions from '../../redux/user'
 import { simulateNoAuth } from '../../utils/auth'
 import { connect } from 'react-redux'
 
-class AppContainer extends Component {
-  constructor (props, context) {
-    super(props, context)
-    console.log('app props', props)
-    this.state = {
-      sideNavOpen: false
-    }
-  }
+class NavBar extends Component {
   logIn = () => {
     const { dispatch } = this.props
     return dispatch(userActions.login())
   }
   render() {
     const { auth, isAuthed } = this.props
-    const styles = {margin: 10}
+    const styles = { margin: 10 }
 
     let leftNav = (
       <div>
@@ -85,6 +78,6 @@ class AppContainer extends Component {
 }
 
 
-const App = connect()(AppContainer)
+const NavBarWithData = connect()(NavBar)
 
-export default App
+export default NavBarWithData

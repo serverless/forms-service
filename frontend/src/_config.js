@@ -1,13 +1,10 @@
 const isDev = (process.env.NODE_ENV === 'development')
 
 export const config = {
-  // cors settings
-  domain: (isDev) ? 'http://localhost:3000' : 'https://serverless-forms.netlify.com/',
   // auth0 setup
   auth0: {
     domain: 'serverlessqa.auth0.com',
     clientId: '92uOHMc6ndhp4lElK1UI0AIkuw7jQIlb',
-    callbackUrl: (isDev) ? 'http://localhost:3000/callback' : 'https://serverless-forms.netlify.com/callback'
   },
   // api endpoints
   api: {
