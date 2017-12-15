@@ -55,7 +55,7 @@ class FormViewContainer extends Component {
       if (data.email) {
         header = (
           <div className='form-entry-header'>
-            <b>[ah ah ah didn't say the magic word]</b> completed form on {prettyDate}
+            <b>{data.email}</b> completed form on {prettyDate}
           </div>
         )
       }
