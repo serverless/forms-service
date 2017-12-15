@@ -78,8 +78,8 @@ Make sure you are using https`
 
       if (!role.length || !this.isAdmin(role)) {
         alert('Sorry you are not an admin of this app! Please contact admin')
-        // no role
-        return false
+        // no role. redirect them home
+        return history.replace('/')
       }
       // Set the time that the access token will expire at
       const expiresAt = JSON.stringify(
