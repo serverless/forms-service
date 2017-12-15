@@ -28,9 +28,8 @@ provider:
   environment:
     FORMS_TABLE: ${self:custom.formsTable}
     ENTRIES_TABLE: ${self:custom.entriesTable}
-    SENDGRID_API_KEY: ${file(./config.${self:custom.currentStage}.json):SENDGRID_API_KEY}
     AUTH0_DOMAIN: ${file(./config.${self:custom.currentStage}.json):AUTH0_DOMAIN}
-    AUTH0_CLIENT_ID: ${file(./config.${self:custom.currentStage}.json):AUTH0_CLIENT_ID}
+    SENDGRID_API_KEY: ${file(./config.${self:custom.currentStage}.json):SENDGRID_API_KEY}
   # Set IAM permissions for the functions
   iamRoleStatements:
   - Effect: Allow
