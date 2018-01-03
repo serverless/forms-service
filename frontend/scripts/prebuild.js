@@ -171,3 +171,25 @@ function getSiteId(siteUrl) {
     return matchingSites[0].site_id
   })
 }
+
+
+/* Get auth0 client token */
+function getAuthClientToken(domain, clientId, secret) {
+  return axios({
+    url: `https://${domain}/oauth/token`,
+    method: 'post',
+    headers: {
+      'content-type': 'application/json'
+    },
+    data: {
+      "grant_type": "client_credentials",
+      "client_id": clientId,
+      "client_secret": secret,
+      "audience": `https://serverlessqa.auth0.com/api/v2/`
+    },
+  }).then((response) => {
+    return response.data.access_token
+  }).catch((error) => {
+    console.log(error)
+  })
+}
