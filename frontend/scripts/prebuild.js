@@ -2,6 +2,8 @@ const auth0 = require('auth0')
 const axios = require('axios')
 const authConfig = require('../src/_config').config
 
+// TODO fix branch with same name conflict.
+
 const SITE_URL = process.env.URL
 const AUTH0_DOMAIN = authConfig.auth0.domain
 const AUTH0_CLIENT_ID = authConfig.auth0.clientId // app to update
