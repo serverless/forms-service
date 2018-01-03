@@ -15,7 +15,7 @@ const AUTH0_CLIENT_ID = authConfig.auth0.clientId // app to update
 const AUTH0_CALLBACK_PATH = authConfig.auth0.callbackPath
 
 /* secrets. Must add to https://app.netlify.com/sites/{your-site}/settings/deploys */
-const NETLIFY_API_TOKEN = process.env.NETLIFY_API_KEY
+const NETLIFY_API_TOKEN = process.env.NETLIFY_API_TOKEN
 const AUTH0_MANAGEMENT_CLIENT_ID = process.env.AUTH0_MANAGEMENT_CLIENT_ID
 const AUTH0_MANAGEMENT_CLIENT_SECRET = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
 
