@@ -10,9 +10,9 @@ console.log('URL', process.env.URL)
 console.log('auth0 config', authConfig)
 
 const SITE_URL = process.env.URL
-const AUTH0_DOMAIN = authConfig.auth.domain
-const AUTH0_CLIENT_ID = authConfig.auth.clientId // app to update
-const AUTH0_CALLBACK_PATH = authConfig.auth.callbackPath
+const AUTH0_DOMAIN = authConfig.auth0.domain
+const AUTH0_CLIENT_ID = authConfig.auth0.clientId // app to update
+const AUTH0_CALLBACK_PATH = authConfig.auth0.callbackPath
 
 /* secrets. Must add to https://app.netlify.com/sites/{your-site}/settings/deploys */
 const NETLIFY_API_TOKEN = process.env.NETLIFY_API_KEY
