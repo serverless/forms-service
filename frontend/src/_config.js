@@ -1,10 +1,10 @@
-const isDev = (process.env.NODE_ENV === 'development')
 
-export const config = {
+module.exports.config = {
   // auth0 setup
   auth0: {
     domain: 'serverlessqa.auth0.com',
     clientId: '92uOHMc6ndhp4lElK1UI0AIkuw7jQIlb',
+    callbackPath: '/callback',
   },
   // api endpoints
   api: {

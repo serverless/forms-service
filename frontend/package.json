@@ -22,5 +22,8 @@
     "postbuild": "cp src/_redirects build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "auth0": "^2.6.0"
   }
 }
