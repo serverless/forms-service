@@ -2,6 +2,8 @@ const auth0 = require('auth0')
 const axios = require('axios')
 const authConfig = require('../src/_config').config
 
+// TODO fix branch with same name conflict.
+
 const SITE_URL = process.env.URL
 const AUTH0_DOMAIN = authConfig.auth0.domain
 const AUTH0_CLIENT_ID = authConfig.auth0.clientId // app to update
@@ -42,9 +44,10 @@ getSiteId(SITE_URL).then((id) => {
   console.log(`Get live netlify urls for site ${id}`)
   const deployUrls = getDeployUrls(id)
   const branchUrls = getBranchUrls(id)
+  const lastSixDeployUrls = getRecentDeployUrls(id)
 
   // return array of active urls
-  return Promise.all([branchUrls, deployUrls]).then(values => {
+  return Promise.all([branchUrls, deployUrls, lastSixDeployUrls]).then(values => {
     return values.reduce((accumulator, currentValue) => {
       let acc = accumulator
       if (currentValue && Array.isArray(currentValue)) {
@@ -155,6 +158,41 @@ function getDeployUrls(siteId) {
         ssl_url: response.data.ssl_url
       }]
       resolve(data)
+    }).catch((err) => {
+      console.log(err)
+    })
+  })
+}
+
+// Get last 6 netlify deploy URLS
+function getRecentDeployUrls(siteId) {
+  return new Promise(resolve => {
+    axios({
+      url: `https://api.netlify.com/api/v1/sites/${siteId}/deploys?access_token\=${NETLIFY_API_TOKEN}`,
+      method: 'get',
+      headers: {
+        'content-type': 'application/json',
+      }
+    }).then((response) => {
+      let lastDeployUrls = []
+      if(response && response.data) {
+        lastDeployUrls = response.data.slice(0, 6).filter((deploy) => {
+          return deploy.branch !== 'master'
+        }).map((d) => {
+          return {
+            // branch: d.branch,
+            // url: d.url,
+            // ssl_url: d.ssl_url,
+            // deploy_url: d.deploy_url,
+            // deploy_ssl_url: d.deploy_ssl_url,
+            // created_at: d.created_at,
+            // updated_at: d.updated_at
+            url: d.deploy_url,
+            ssl_url: d.deploy_ssl_url,
+          }
+        })
+      }
+      resolve(lastDeployUrls)
     }).catch((err) => {
       console.log(err)
     })
