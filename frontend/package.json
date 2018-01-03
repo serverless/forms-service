@@ -17,6 +17,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "prebuild": "node scripts/prebuild.js",
     "build": "react-scripts build",
     "postbuild": "cp src/_redirects build",
     "test": "react-scripts test --env=jsdom",

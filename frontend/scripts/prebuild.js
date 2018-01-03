@@ -1,0 +1,5 @@
+console.log(process.env)
+console.log('process.env.DEPLOY_URL', process.env.DEPLOY_URL)
+console.log('process.env.DEPLOY_PRIME_URL', process.env.DEPLOY_PRIME_URL)
+console.log('process.env.BRANCH', process.env.BRANCH)
+console.log('COMMIT_REF', process.env.COMMIT_REF)
