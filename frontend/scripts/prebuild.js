@@ -2,13 +2,6 @@ const auth0 = require('auth0')
 const axios = require('axios')
 const authConfig = require('../src/_config').config
 
-console.log('process.env.DEPLOY_URL', process.env.DEPLOY_URL)
-console.log('process.env.DEPLOY_PRIME_URL', process.env.DEPLOY_PRIME_URL)
-console.log('process.env.BRANCH', process.env.BRANCH)
-console.log('COMMIT_REF', process.env.COMMIT_REF)
-console.log('URL', process.env.URL)
-console.log('auth0 config', authConfig)
-
 const SITE_URL = process.env.URL
 const AUTH0_DOMAIN = authConfig.auth0.domain
 const AUTH0_CLIENT_ID = authConfig.auth0.clientId // app to update
@@ -19,18 +12,28 @@ const NETLIFY_API_TOKEN = process.env.NETLIFY_API_TOKEN
 const AUTH0_MANAGEMENT_CLIENT_ID = process.env.AUTH0_MANAGEMENT_CLIENT_ID
 const AUTH0_MANAGEMENT_CLIENT_SECRET = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
 
+const errMsg = `Unable to sync allowed callback urls with auth0 client.
+
+Set these environment variables inside of your netlify deploy settings https://app.netlify.com/sites/{your-site}/settings/deploys
+
+Doing so will automatically lock down allowed callback URLS in your auth0 client
+for enhanced security`
+
 if (!NETLIFY_API_TOKEN) {
-  console.log('no NETLIFY_API_TOKEN found in process.env. Unable to sync auth0 client')
+  console.log('NETLIFY_API_TOKEN environment variable not found.')
+  console.log(errMsg)
   return false
 }
 
 if (!AUTH0_MANAGEMENT_CLIENT_ID) {
-  console.log('no AUTH0_MANAGEMENT_CLIENT_ID found in process.env. Unable to sync auth0 client')
+  console.log('AUTH0_MANAGEMENT_CLIENT_ID environment variable not found.')
+  console.log(errMsg)
   return false
 }
 
 if (!AUTH0_MANAGEMENT_CLIENT_SECRET) {
-  console.log('no AUTH0_MANAGEMENT_CLIENT_SECRET found in process.env. Unable to sync auth0 client')
+  console.log('AUTH0_MANAGEMENT_CLIENT_SECRET environment variable not found.')
+  console.log(errMsg)
   return false
 }
 
@@ -172,7 +175,6 @@ function getSiteId(siteUrl) {
   })
 }
 
-
 /* Get auth0 client token */
 function getAuthClientToken(domain, clientId, secret) {
   return axios({
@@ -193,3 +195,13 @@ function getAuthClientToken(domain, clientId, secret) {
     console.log(error)
   })
 }
+
+/*
+debug
+console.log('process.env.DEPLOY_URL', process.env.DEPLOY_URL)
+console.log('process.env.DEPLOY_PRIME_URL', process.env.DEPLOY_PRIME_URL)
+console.log('process.env.BRANCH', process.env.BRANCH)
+console.log('COMMIT_REF', process.env.COMMIT_REF)
+console.log('URL', process.env.URL)
+console.log('auth0 config', authConfig)
+*/
