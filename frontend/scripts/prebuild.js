@@ -19,8 +19,8 @@ const NETLIFY_API_TOKEN = process.env.NETLIFY_API_KEY
 const AUTH0_MANAGEMENT_CLIENT_ID = process.env.AUTH0_MANAGEMENT_CLIENT_ID
 const AUTH0_MANAGEMENT_CLIENT_SECRET = process.env.AUTH0_MANAGEMENT_CLIENT_SECRET
 
-if (!NETLIFY_API_KEY) {
-  console.log('no NETLIFY_API_KEY found in process.env. Unable to sync auth0 client')
+if (!NETLIFY_API_TOKEN) {
+  console.log('no NETLIFY_API_TOKEN found in process.env. Unable to sync auth0 client')
   return false
 }
 
