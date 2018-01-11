@@ -38,9 +38,9 @@ function postDeploy(outputs) {
       if (!config.output || !config.output.file) {
         throw new Error(`No custom.output.file value found in serverless.yml`)
       }
-      console.log(config.output.file);
+      // console.log(config.output.file);
       const outputPath = path.resolve(config.output.file)
-      console.log('outputPath', outputPath)
+      // console.log('outputPath', outputPath)
 
       fs.writeFile(outputPath, JSON.stringify(data, null, 2), (err) => {
         if (err) throw err;
@@ -51,7 +51,7 @@ function postDeploy(outputs) {
     console.log(e)
   }
   // write to file
-  console.log(data)
+  // console.log(data)
 }
 
 module.exports.handler = postDeploy
