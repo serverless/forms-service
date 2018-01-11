@@ -50,12 +50,12 @@ class FormViewContainer extends Component {
       console.log('data', data)
       const date = formatTime(data.timestamp)
       const prettyDate = new Date(data.timestamp * 1000).toDateString()
-
+      const email = 'Email hidden for demo 🙈' || data.email
       let header
       if (data.email) {
         header = (
           <div className='form-entry-header'>
-            <b>{data.email}</b> completed form on {prettyDate}
+            <b>{email}</b> completed form on {prettyDate}
           </div>
         )
       }
@@ -125,7 +125,9 @@ class FormViewContainer extends Component {
     }
     return (
       <AppLayout>
-        {backButton}
+        <div className='back-button-action'>
+          {backButton}
+        </div>
         <h1 className='page-title'>
           {capitalizeWords(match.params.id.split("-").join(" "))} Form
           <span

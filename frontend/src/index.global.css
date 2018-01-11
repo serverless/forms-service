@@ -100,7 +100,11 @@ html, body {
 
 
 /** Single Form View **/
-
+.back-button-action {
+  font-size: 12px;
+  margin-top: 10px;
+  margin-bottom: -10px;
+}
 .form-entry-wrapper {
   box-shadow: 0px 2px 4px rgba(126, 142, 177, 0.12);
   margin-bottom: 20px;
