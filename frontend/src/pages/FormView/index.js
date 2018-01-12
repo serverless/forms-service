@@ -117,8 +117,11 @@ class FormViewContainer extends Component {
 
     if (entriesError) {
       return (
-        <div>
+        <div style={{margin: 20}}>
           Sorry dude {entriesError.message}.<br/><br/>
+
+          Please login again.<br/><br/>
+
           {backButton}
         </div>
       )

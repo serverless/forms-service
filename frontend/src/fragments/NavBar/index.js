@@ -25,8 +25,11 @@ class NavBar extends Component {
     )
 
     let rightNav = (
-      <span>
-        <button className="btn-margin" onClick={this.logIn} style={styles}>
+      <span className='right-nav-contents'>
+        <a href="https://github.com/serverless/forms-service">
+          View on Github
+        </a>
+        <button className="btn-margin" onClick={this.logIn}>
           Log In
         </button>
       </span>

@@ -4,7 +4,7 @@ import AppLayout from '../../fragments/AppLayout'
 const Loading = () => {
   return (
     <AppLayout>
-      <div>
+      <div style={{marginTop: 20}}>
         Loading...
       </div>
     </AppLayout>

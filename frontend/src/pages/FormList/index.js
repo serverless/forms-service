@@ -105,7 +105,7 @@ class FormListContainer extends Component {
 
     if (error) {
       formsList = (
-        <div>
+        <div style={{margin: 20}}>
           Sorry dude {error.message}. Please login again
           <br />
           <button onClick={this.logOut}>logOut</button>
