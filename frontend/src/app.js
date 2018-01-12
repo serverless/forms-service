@@ -1,6 +1,7 @@
 import React from 'react'
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import NavBar from './fragments/NavBar'
+import AppLayout from './fragments/AppLayout'
 import FormList from './pages/FormList'
 import FormView from './pages/FormView'
 import Profile from './pages/UserProfile'
@@ -100,9 +101,9 @@ const PleaseLogin = (props) => {
   // if known protected routes, ask for login.
   if (path.match(/profile/) || path.match(/forms/)) {
     return (
-      <div>
+      <AppLayout>
         <h3>You must be logged in to view this page</h3>
-      </div>
+      </AppLayout>
     )
   }
   // else show 404
