@@ -28,6 +28,12 @@ html, body {
 .logo {
   font-size: 25px;
   margin-right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content:center;
+}
+.logo img {
+  width: 180px;
 }
 .left-nav, .right-nav  {
   display: flex;
