@@ -32,6 +32,7 @@ const Welcome = ({ location }) => (
         <li>Node backend running in AWS Lambda Functions</li>
         <li>Using AWS DynamoDB noSQL database</li>
         <li>User Authorization handled via API Gateway Custom Authorizer Functions</li>
+        <li>Made possible with the <a href="https://github.com/serverless/serverless">serverless framework</a></li>
       </ul>
 
       <div>
@@ -41,7 +42,7 @@ const Welcome = ({ location }) => (
       </div>
 
       <h2>
-        <a href="https://github.com/serverless/forms-service">Fork on github</a>
+        <a href="https://github.com/serverless/forms-service">Fork on github</a> built with love by <a href="http://twitter.com/davidwells">DavidWells</a>
       </h2>
 
     </div>
