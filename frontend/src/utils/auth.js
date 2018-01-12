@@ -1,10 +1,7 @@
 import auth0Instance from './authInstance'
 import decode from 'jwt-decode'
 import history from './history'
-import { config } from '../_config'
-import { getXsrfToken, clearXsrfToken } from './xsrf'
-
-const AUTH_CONFIG = config.auth0
+import { getXsrfToken, clearXsrfToken } from './xsrf' // eslint-disable-line
 
 export default class Auth {
   auth0 = auth0Instance();

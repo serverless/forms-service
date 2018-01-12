@@ -119,6 +119,8 @@ class FormListContainer extends Component {
           <h1 className='page-title'>
             Forms
             <span
+              role="img"
+              aria-label="refresh"
               className='refresh-button'
               title='refresh form list'
               onClick={this.loadForms}>

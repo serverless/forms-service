@@ -34,7 +34,7 @@ class FormViewContainer extends Component {
     }
   }
   renderSubmissions() {
-    const { entries, forms, match } = this.props
+    const { entries, forms, match } = this.props // eslint-disable-line
     // console.log('submissions', submissions)
     // console.log('forms', forms)
     const formId = match.params.id
@@ -48,7 +48,7 @@ class FormViewContainer extends Component {
     const order = sortDate('timestamp', sortOrder)
     const submissionItems = subs.sort(order).map((data, i) => {
       console.log('data', data)
-      const date = formatTime(data.timestamp)
+      const date = formatTime(data.timestamp) // eslint-disable-line
       const prettyDate = new Date(data.timestamp * 1000).toDateString()
       const email = 'Email hidden for demo 🙈' || data.email
       let header
@@ -131,6 +131,8 @@ class FormViewContainer extends Component {
         <h1 className='page-title'>
           {capitalizeWords(match.params.id.split("-").join(" "))} Form
           <span
+            role="img"
+            aria-label="refresh"
             className='refresh-button'
             title='refresh form list'
             onClick={this.loadFormEntries}>
