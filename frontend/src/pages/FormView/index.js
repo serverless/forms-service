@@ -50,7 +50,8 @@ class FormViewContainer extends Component {
       console.log('data', data)
       const date = formatTime(data.timestamp) // eslint-disable-line
       const prettyDate = new Date(data.timestamp * 1000).toDateString()
-      const email = 'Email hidden for demo 🙈' || data.email
+      const email = data.email
+      // const email = 'Email hidden for demo 🙈'
       let header
       if (data.email) {
         header = (
