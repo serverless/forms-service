@@ -112,7 +112,7 @@ class FormViewContainer extends Component {
 
     const backButton = (
       <Link to={`/forms/`}>
-        Back to forms list
+        {'◁ Back to forms list'}
       </Link>
     )
 
