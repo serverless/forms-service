@@ -73,7 +73,7 @@ module.exports = (event, context, callback) => {
 
         /* Does role match? */
         const roles = decoded['https://serverless.com/roles']
-        if (!roles || !roles.length || !roles.includes('admin')) {
+        if (!roles || !roles.length || !roles.includes('forms-app-admin')) {
           console.log(`User ${decoded.sub} is not an admin`)
           console.log(`User ${decoded.sub} current roles:`, roles)
           return callback('Unauthorized')

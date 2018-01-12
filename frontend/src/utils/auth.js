@@ -133,7 +133,11 @@ Make sure you are using https`
   }
 
   isAdmin(rolesArray) {
-    return rolesArray.indexOf('admin') > -1
+    return rolesArray.indexOf('forms-app-admin') > -1
+  }
+
+  isSuperAdmin(rolesArray) {
+    return rolesArray.indexOf('forms-app-super-admin') > -1
   }
 
   getRole(token) {
