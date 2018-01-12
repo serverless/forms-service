@@ -11,7 +11,7 @@ class NavBar extends Component {
   }
   render() {
     const { auth, isAuthed } = this.props
-    const styles = { margin: 10 }
+    const styles = { margin: 15 }
 
     let leftNav = (
       <div>
@@ -65,7 +65,7 @@ class NavBar extends Component {
       <div>
         <nav className='navbar'>
           <div className='left-nav'>
-            <Link className='logo' to='/'>
+            <Link className='logo' title='logo' to='/'>
               ⊂◉‿◉つ
             </Link>
             {leftNav}

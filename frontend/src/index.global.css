@@ -158,5 +158,14 @@ html, body {
   padding: 20px;
 }
 .form-entry-field {
-  margin-bottom: 3px;
+  margin-bottom: 10px;
+  display: flex;
+}
+.form-entry-field span {
+  font-weight: 200;
+}
+.form-entry-field b {
+  display: inline-block;
+  min-width: 140px;
+  font-weight: bold;
 }

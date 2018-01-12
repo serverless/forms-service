@@ -72,7 +72,7 @@ class FormViewContainer extends Component {
         return 0;
       }).map((label, n) => {
         let value = data[label]
-
+        const cleanLabel = label.replace(/_/g, ' ')
         if (!value) {
           return null
         }
@@ -88,7 +88,7 @@ class FormViewContainer extends Component {
         // then render
         return (
           <div key={`${label}-${n}`} className='form-entry-field'>
-            <b>{label}</b>: {value}
+            <b>{cleanLabel}:</b><span>{value}</span>
           </div>
         )
       })
