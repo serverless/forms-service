@@ -12,15 +12,15 @@ module.exports = function getForms(event, context, callback) {
     const formList = forms || []
     if (offset) {
       // update scan with offset
-      params.ExclusiveStartKey = offset;
+      params.ExclusiveStartKey = offset
     }
     return dynamoDoc.scan(params).promise().then((result) => {
-      const allForms = formList.concat(result.Items);
+      const allForms = formList.concat(result.Items)
       if (!result.LastEvaluatedKey) {
         return allForms
       }
       console.log('Recusive call to next page of forms')
-      return getAllForms(allForms, result.LastEvaluatedKey);
+      return getAllForms(allForms, result.LastEvaluatedKey)
     })
   }
 

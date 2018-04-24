@@ -46,15 +46,15 @@ module.exports = function getFormEntries(event, context, callback) {
     const entries = formEntries || []
     if (offset) {
       // update query with offset
-      params.ExclusiveStartKey = offset;
+      params.ExclusiveStartKey = offset
     }
     return dynamoDoc.query(params).promise().then((result) => {
-      const allFormEntries = entries.concat(result.Items);
+      const allFormEntries = entries.concat(result.Items)
       if (!result.LastEvaluatedKey) {
         return allFormEntries
       }
       console.log('Recusive call to next page of data')
-      return getFormResults(allFormEntries, result.LastEvaluatedKey);
+      return getFormResults(allFormEntries, result.LastEvaluatedKey)
     })
   }
 
