@@ -11,6 +11,9 @@ import * as userActions from '../../redux/user'
 // TODO change token expire timeout
 // and look into refresh tokens
 class FormListContainer extends Component {
+  state = {
+    filterText: ''
+  }
   componentDidMount() {
     const { forms, lastFetched } = this.props
     console.log('lastFetched', lastFetched)
@@ -36,12 +39,60 @@ class FormListContainer extends Component {
     const { dispatch } = this.props
     return dispatch(userActions.logout())
   }
-  renderFormList() {
-    console.log(this.props)
+  handleFilterInput = (e) => {
+    this.setState({
+      filterText: e.target.value
+    })
+  }
+  getForms = () => {
     const { forms } = this.props
-    console.log()
-    if (!forms) return null
-    const formListItems = forms.map((form, i) => {
+    const { filterText } = this.state
+
+    if (!forms || !forms.length) {
+      return []
+    }
+
+    return Object.keys(forms).filter((form) => {
+      const data = forms[form]
+      if (data && data.formId && filterText !== '') {
+        const word = capitalizeWords(data.formId.split("-").join(" "))
+        return data.formId.toLowerCase().indexOf(filterText) > -1 ||
+          data.formId.indexOf(filterText) > -1 ||
+          word.toLowerCase().indexOf(filterText) > -1 ||
+          word.indexOf(filterText) > -1
+      }
+      return true
+    }).map((formId, i) => {
+      const data = forms[formId]
+      return data
+    })
+
+  }
+  renderFormList() {
+
+    const { forms } = this.props
+    const { filterText } = this.state
+    // filtered form data getForms
+    const getForms = this.getForms()
+    if (!forms) {
+      return null
+    }
+
+    // No forms with filterText match found
+    if (!getForms.length && filterText) {
+      return (
+        <div className='not-found'>
+          <h2>
+            Service "{filterText}" not found 🙈
+          </h2>
+          <div>
+            Clear your search and try again
+          </div>
+        </div>
+      )
+    }
+
+    const formListItems = getForms.map((form, i) => {
       const updatedAt = timeAgo.ago(form.updated * 1000)
       let notifications
       if (form.notify && form.notify.length) {
@@ -97,8 +148,8 @@ class FormListContainer extends Component {
 
     if (loading) {
       formsList = (
-        <div>
-          Loading Homie
+        <div className='forms-list'>
+          Loading form data
         </div>
       )
     }
@@ -126,7 +177,13 @@ class FormListContainer extends Component {
               onClick={this.loadForms}>
               🔄
             </span>
+            <input
+              onChange={this.handleFilterInput}
+              placeholder='Search Forms'
+              className='search-input'
+            />
           </h1>
+
           {formsList}
         </div>
       </AppLayout>
