@@ -33,7 +33,7 @@ Collect and manage form data with serverless tech.
 
 2. Setup auth0 client. See Auth0 Setup below
 
-3. Then deploy the backend application. ([install `serverless`](serverless.com/getting-started/) if you haven't already)
+3. Then deploy the backend application. ([install `serverless`](https://serverless.com/getting-started/) if you haven't already)
 
   ```bash
   cd backend
