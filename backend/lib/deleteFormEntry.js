@@ -9,9 +9,8 @@ const FORMS_TABLE = process.env.FORMS_TABLE
   Update forms table and form entries table on form submission
 */
 module.exports = function deleteFormEntry(event, context, callback) {
-  console.log(event.headers.origin)
-  console.log(context)
   const body = JSON.parse(event.body)
+  console.log('Deletion started', body)
   // for keeping lambda warm
   if (body && body.action === 'ping') {
     return callback(null, {
@@ -35,16 +34,14 @@ module.exports = function deleteFormEntry(event, context, callback) {
   const updateTimestamp = Math.round(+new Date() / 1000)
 
   const entryParams = {
-    TableName : ENTRIES_TABLE,
+    TableName: ENTRIES_TABLE,
     Key: {
-      HashKey: formId,
-      NumberRangeKey: timestamp
+      formId: formId,
+      timestamp: timestamp
     }
   }
-  console.log('Delete params', entryParams)
 
   dynamoDoc.delete(entryParams).promise().then((d) => {
-    console.log('d', d)
     const formParams = {
       TableName: FORMS_TABLE,
       Key: {
@@ -61,7 +58,7 @@ module.exports = function deleteFormEntry(event, context, callback) {
       },
       ReturnValues: 'ALL_NEW'
     }
-
+    console.log('formParams', formParams)
     return dynamoDoc.update(formParams).promise().then((data) => {
       if (!data || !data.Attributes) {
         return callback(new Error('[500] Database error. No form Data'))
@@ -72,8 +69,7 @@ module.exports = function deleteFormEntry(event, context, callback) {
         statusCode: 200,
         headers: corsHeaders,
         body: JSON.stringify({
-          success: true,
-          data: 'foo'
+          success: true
         })
       })
     })
