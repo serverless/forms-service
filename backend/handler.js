@@ -8,6 +8,9 @@ module.exports.auth = require('./lib/auth')
 /* Update forms table and form entries table on form submission */
 module.exports.handleFormEntry = require('./lib/handleFormEntry')
 
+/* Delete form entry & update form submission count */
+module.exports.deleteFormEntry = require('./lib/deleteFormEntry')
+
 /* Get list of forms */
 module.exports.getForms = require('./lib/getForms')
 

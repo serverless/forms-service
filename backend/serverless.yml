@@ -67,6 +67,14 @@ functions:
           method: post
           authorizer: auth
           cors: true
+  deleteFormEntry:
+    handler: handler.deleteFormEntry
+    events:
+      - http:
+          path: delete-entry
+          method: post
+          authorizer: auth
+          cors: true
   updateFormSettings:
     handler: handler.updateFormSettings
     events:
