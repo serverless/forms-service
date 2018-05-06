@@ -25,6 +25,21 @@ export function getForms() {
   })
 }
 
+// deleteFormEntry
+export function deleteEntry(data) {
+  return axios({
+    method: 'post',
+    url: config.api.deleteEntry,
+    data: data,
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('id_token')}`
+    },
+    // validateStatus: (status) => {
+    //   return status < 500; // Reject only if the status code is greater than or equal to 500
+    // }
+  })
+}
+
 // get single form submissions
 export function getSingleFormData(formId) {
   // alert('Make API call')

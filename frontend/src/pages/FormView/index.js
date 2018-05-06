@@ -5,11 +5,14 @@ import AppLayout from '../../fragments/AppLayout'
 import * as formActions from '../../redux/forms'
 
 class FormViewContainer extends Component {
+  state = {
+    entryFilter: ''
+  }
   loadFormEntries = () => {
     const { dispatch, match } = this.props
     const id = match.params.id
     return dispatch(formActions.getFormEntries(id)).catch((e) => {
-      console.log('nope')
+      console.log('nope', e)
     })
   }
   componentDidMount() {
@@ -23,7 +26,7 @@ class FormViewContainer extends Component {
       dispatch(formActions.fetchAllFormData()).then(() => {
         console.log('fetched form data from API')
       }).catch((e) => {
-
+        console.log('nope', e)
       })
     }
 
@@ -33,21 +36,62 @@ class FormViewContainer extends Component {
       })
     }
   }
+  deleteEntry = (formData) => {
+    const { entries, forms, dispatch, match } = this.props
+    if (window.confirm("Do you really want delete this?")) {
+      dispatch(formActions.deleteFormEntry(formData)).then(() => {
+        console.log('Deleted it!')
+      })
+    }
+  }
+  handleFilterInput = (e) => {
+    this.setState({
+      entryFilter: e.target.value
+    })
+  }
   renderSubmissions() {
+    const { entryFilter } = this.state
     const { entries, forms, match } = this.props // eslint-disable-line
-    // console.log('submissions', submissions)
-    // console.log('forms', forms)
+
     const formId = match.params.id
     const subs = entries[formId]
-    if (!subs) {
+
+    if (!subs || !subs.length) {
       return (
         <div>loading...</div>
       )
     }
+
+    // Filter based off search
+    const filteredEntries = subs.filter((entry) => {
+      if (entry && entry.email && entryFilter !== '') {
+        const { name, email, company } = entry
+        const emailMatch = email && email.indexOf(entryFilter) > -1
+        const nameMatch = (name && (name.toLowerCase().indexOf(entryFilter) > -1 || name.indexOf(entryFilter) > -1))
+        const companyMatch = (company && (company.toLowerCase().indexOf(entryFilter) > -1 || company.indexOf(entryFilter) > -1))
+        return emailMatch || nameMatch || companyMatch
+      }
+      return true
+    })
+
+    // No forms with filterText match found
+    if (!filteredEntries.length && entryFilter) {
+      return (
+        <div className='not-found'>
+          <h2>
+            Entry "{entryFilter}" not found 🙈
+          </h2>
+          <div>
+            Clear your search and try again
+          </div>
+        </div>
+      )
+    }
+
     const sortOrder = 'desc'
     const order = sortDate('timestamp', sortOrder)
-    const submissionItems = subs.sort(order).map((data, i) => {
-      console.log('data', data)
+    const submissionItems = filteredEntries.sort(order).map((data, i) => {
+      // console.log('data', data)
       const date = formatTime(data.timestamp) // eslint-disable-line
       const prettyDate = new Date(data.timestamp * 1000).toDateString()
       const email = data.email
@@ -55,8 +99,16 @@ class FormViewContainer extends Component {
       let header
       if (data.email) {
         header = (
-          <div className='form-entry-header'>
-            <b>{email}</b> completed form on {prettyDate}
+          <div className='form-entry-header' data-time={data.timestamp}>
+            <b>{email} - {prettyDate}</b>
+            <span>
+              <button
+                className="grey-btn"
+                style={{marginRight: 10}}
+                onClick={this.deleteEntry.bind(null, data)}>
+                Delete Entry
+              </button>
+            </span>
           </div>
         )
       }
@@ -89,7 +141,7 @@ class FormViewContainer extends Component {
         // then render
         return (
           <div key={`${label}-${n}`} className='form-entry-field'>
-            <b>{cleanLabel}:</b><span>{value}</span>
+            <b>{cleanLabel}</b><span>{value}</span>
           </div>
         )
       })
@@ -127,6 +179,7 @@ class FormViewContainer extends Component {
         </div>
       )
     }
+
     return (
       <AppLayout>
         <div className='back-button-action'>
@@ -144,7 +197,15 @@ class FormViewContainer extends Component {
           </span>
         </h1>
 
-        <h3>Submissions</h3>
+        <h3>
+          Submissions
+          <input
+            onChange={this.handleFilterInput}
+            placeholder='Search Entries'
+            className='search-input'
+          />
+        </h3>
+
         <div className='card-block'>
           {this.renderSubmissions()}
         </div>

@@ -192,7 +192,6 @@ class FormListContainer extends Component {
 }
 
 function mapReduxStateToProps({forms}) {
-  console.log('formsformsforms', forms)
   return {
     forms: forms.forms,
     lastFetched: forms.lastFetched,

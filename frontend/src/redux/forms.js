@@ -1,15 +1,20 @@
-import { getForms, getSingleFormData } from '../utils/api'
+import { getForms, getSingleFormData, deleteEntry } from '../utils/api'
 
 /**
  * Action types
  */
+// get forms
 const FETCH_FORMS_START = 'FETCH_FORMS_START'
 const FETCH_FORMS_SUCCESS = 'FETCH_FORMS_SUCCESS'
 const FETCH_FORMS_ERROR = 'FETCH_FORMS_ERROR'
+// get entries
 const FETCH_ENTRIES_START = 'FETCH_ENTRIES_START'
 const FETCH_ENTRIES_SUCCESS = 'FETCH_ENTRIES_SUCCESS'
 const FETCH_ENTRIES_ERROR = 'FETCH_ENTRIES_ERROR'
-
+// delete entries
+const DELETE_ENTRY_START = 'DELETE_ENTRY_START'
+const DELETE_ENTRY_SUCCESS = 'DELETE_ENTRIES_SUCCESS'
+const DELETE_ENTRY_ERROR = 'DELETE_ENTRIES_ERROR'
 /**
  * Action creators
  */
@@ -96,6 +101,54 @@ export function getFormEntries(formId) {
   }
 }
 
+
+export function deleteFormEntry(formData) {
+  console.log('deleteFormEntry', formData)
+  return (dispatch, getState) => {
+    // start request
+    dispatch({
+      type: DELETE_ENTRY_START
+    })
+    // make api call
+    return deleteEntry(formData).then((response) => {
+      // request success
+      if (response.data.success) {
+        dispatch({
+          type: DELETE_ENTRY_SUCCESS,
+          formData: formData,
+        })
+      } else {
+        // dynamo returned empty array
+        // TODO fix this in api
+        dispatch({
+          type: DELETE_ENTRY_ERROR,
+          error: {
+            message: `${formData.formId} not found`
+          }
+        })
+      }
+      // return Promise.resolve();
+    }).catch((error) => {
+
+      dispatch({
+        type: DELETE_ENTRY_ERROR,
+        error: error
+      })
+
+      if (error.response && error.response.status === 401) {
+        dispatch({
+          type: DELETE_ENTRY_ERROR,
+          error: error.response.data
+        })
+      }
+      console.log(error.response)
+      // request failed
+      // return Promise.reject(error)
+    })
+  }
+}
+
+
 /**
  * Reducer
  */
@@ -151,6 +204,30 @@ export default function formsReducer(state = initialState, action) {
         },
         lastFetched: action.timestamp,
         entriesError: null
+      }
+    case DELETE_ENTRY_SUCCESS:
+      const { formId, timestamp } = action.formData
+      const updatedEntries = state.entries[formId].filter((entry) => {
+        return entry.timestamp !== timestamp
+      })
+      const newEntries = {}
+      newEntries[`${formId}`] = updatedEntries
+
+      const updatedForms = state.forms.map((form) => {
+        if (form.formId === formId) {
+          const newCount = form.submissionCount - 1
+          return { ...form, ...{ submissionCount: newCount }}
+        }
+        return form
+      })
+      return {
+        ...state,
+        loading: false,
+        entries: {
+          ...state.entries,
+          ...newEntries
+        },
+        forms: updatedForms,
       }
     // set error on ajax failure
     case FETCH_ENTRIES_ERROR:
