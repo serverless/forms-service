@@ -23,6 +23,10 @@ class App extends React.Component {
   componentWillMount() {
     this.checkLogin()
   }
+  logIn = () => {
+    const { dispatch } = this.props
+    return dispatch(userActions.login())
+  }
   checkLogin = () => {
     const { isAuthed, dispatch } = this.props
     if (isAuthed) {
@@ -66,7 +70,7 @@ class App extends React.Component {
                   <Route path={`/`} exact component={Welcome} />
                   <Route path={`/public`} exact component={PublicRoute} />
                   {/* <Redirect to={`/`} /> */}
-                  <Route component={PleaseLogin} />
+                  <Route render={() => <PleaseLogin logIn={this.logIn} {...props} />}  />
                 </Switch>
               )
             }
@@ -99,12 +103,16 @@ const PublicRoute = ({ location }) => (
 )
 
 const PleaseLogin = (props) => {
+  console.log('props', props)
   const path = props.location.pathname
   // if known protected routes, ask for login.
   if (path.match(/profile/) || path.match(/forms/)) {
     return (
       <AppLayout>
         <h3>You must be logged in to view this page</h3>
+        <button className="grey-btn" onClick={props.logIn}>
+          Log In
+        </button>
       </AppLayout>
     )
   }

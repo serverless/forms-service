@@ -29,7 +29,7 @@ class NavBar extends Component {
         <a href="https://github.com/serverless/forms-service">
           View on Github
         </a>
-        <button className="btn-margin" onClick={this.logIn}>
+        <button style={{marginLeft: 20}} className="grey-btn" onClick={this.logIn}>
           Log In
         </button>
       </span>
@@ -44,17 +44,19 @@ class NavBar extends Component {
           <Link to={`/profile/`} style={styles}>
             Profile
           </Link>
-          <Link to={`/akjdakldjlkjdlkdja/`} style={styles}>
-            404 link
-          </Link>
+          {/* 404 example link
+            <Link to={`/akjdakldjlkjdlkdja/`} style={styles}>
+              404 link
+            </Link>
+          */}
         </span>
       )
       rightNav = (
         <span>
-          <button onClick={simulateNoAuth}>
+          <button className="grey-btn" onClick={simulateNoAuth}>
             Mangle JWT Token
           </button>
-          <button className="btn-margin" onClick={auth.logout} style={styles}>
+          <button className="grey-btn" onClick={auth.logout} style={styles}>
             Log Out
           </button>
         </span>

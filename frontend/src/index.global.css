@@ -52,7 +52,7 @@ a {
 .right-nav-contents {
 
 }
-.navbar button, .grey-btn {
+.grey-btn {
   padding: 0 10px;
   display: inline-block;
   font-weight: 600;
@@ -68,7 +68,7 @@ a {
   background-size: 110% 110%;
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFAFBFC', endColorstr='#FFE4EBF0')";
 }
-.navbar button:hover, .grey-btn:hover {
+.grey-btn:hover {
   background-color: #e6ebf1;
   background-image: linear-gradient(to bottom, #f0f3f6, #dce3ec);
   border-color: #afb1b2;
