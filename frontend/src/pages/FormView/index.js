@@ -182,29 +182,34 @@ class FormViewContainer extends Component {
 
     return (
       <AppLayout>
-        <div className='back-button-action'>
-          {backButton}
-        </div>
-        <h1 className='page-title'>
-          {capitalizeWords(match.params.id.split("-").join(" "))} Form
+        <div className='app-actions'>
+          <span className='action'>
+            {backButton}
+          </span>
+          <span className='action'>
+            <Link to={`/forms/${match.params.id}/settings`}>
+              {'⚙ Form Settings'}
+            </Link>
+          </span>
           <span
-            role="img"
             aria-label="refresh"
-            className='refresh-button'
+            className='action'
             title='refresh form list'
             onClick={this.loadFormEntries}>
-            🔄
+            Refresh entries
           </span>
+        </div>
+        <h1 className='page-title'>
+          {capitalizeWords(match.params.id.split("-").join(" "))} Form Entries
         </h1>
 
-        <h3>
-          Submissions
+        <div className='search-input-wrapper'>
           <input
             onChange={this.handleFilterInput}
-            placeholder='Search Entries'
+            placeholder='🔍 Search Form Entries'
             className='search-input'
           />
-        </h3>
+        </div>
 
         <div className='card-block'>
           {this.renderSubmissions()}

@@ -4,6 +4,7 @@ import NavBar from './fragments/NavBar'
 import AppLayout from './fragments/AppLayout'
 import FormList from './pages/FormList'
 import FormView from './pages/FormView'
+import FormSettings from './pages/FormSettings'
 import Profile from './pages/UserProfile'
 import Welcome from './pages/Welcome'
 import Loading from './pages/Loading'
@@ -75,6 +76,7 @@ class App extends React.Component {
               <Switch>
                 <Route path={`/`} exact render={dashboardRedirect} />
                 <Route path={`/forms`} exact component={FormList} />
+                <Route path={`/forms/:id/settings`} component={FormSettings} />
                 <Route path={`/forms/:id`} component={FormView} />
                 <Route path={`/profile`} render={profile} />
                 {/* <Redirect to={`/`} /> */}

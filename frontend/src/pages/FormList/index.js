@@ -179,8 +179,9 @@ class FormListContainer extends Component {
             </span>
             <input
               onChange={this.handleFilterInput}
-              placeholder='Search Forms'
+              placeholder='🔍 Search Forms'
               className='search-input'
+              style={{marginLeft: 20}}
             />
           </h1>
 

@@ -1,8 +1,11 @@
-import { getForms, getSingleFormData, deleteEntry } from '../utils/api'
+import {
+  getForms,
+  getSingleFormData,
+  updateFormSettings,
+  deleteEntry
+} from '../utils/api'
 
-/**
- * Action types
- */
+/* Action types */
 // get forms
 const FETCH_FORMS_START = 'FETCH_FORMS_START'
 const FETCH_FORMS_SUCCESS = 'FETCH_FORMS_SUCCESS'
@@ -15,9 +18,12 @@ const FETCH_ENTRIES_ERROR = 'FETCH_ENTRIES_ERROR'
 const DELETE_ENTRY_START = 'DELETE_ENTRY_START'
 const DELETE_ENTRY_SUCCESS = 'DELETE_ENTRIES_SUCCESS'
 const DELETE_ENTRY_ERROR = 'DELETE_ENTRIES_ERROR'
-/**
- * Action creators
- */
+// update form settings
+const UPDATE_FORM_SETTINGS_START = 'UPDATE_FORM_SETTINGS_START'
+const UPDATE_FORM_SETTINGS_SUCCESS = 'UPDATE_FORM_SETTINGS_SUCCESS'
+const UPDATE_FORM_SETTINGS_ERROR = 'UPDATE_FORM_SETTINGS_ERROR'
+
+/* Action creators */
 export function fetchAllFormData() {
   return (dispatch, getState) => {
     // start request
@@ -95,8 +101,6 @@ export function getFormEntries(formId) {
       }
       console.log(error.response)
       // request failed
-
-      // return Promise.reject(error)
     })
   }
 }
@@ -142,16 +146,43 @@ export function deleteFormEntry(formData) {
         })
       }
       console.log(error.response)
-      // request failed
-      // return Promise.reject(error)
     })
   }
 }
 
 
-/**
- * Reducer
- */
+export function updateSettings(formId, emails) {
+  console.log('updateFormSettings', formId, emails)
+  return (dispatch, getState) => {
+    // start request
+    dispatch({
+      type: UPDATE_FORM_SETTINGS_START
+    })
+    // make api call
+    return updateFormSettings(formId, emails).then((response) => {
+      console.log(response)
+      // request success
+      if (response.data.success) {
+        dispatch({
+          type: UPDATE_FORM_SETTINGS_SUCCESS,
+          formId: formId,
+          emails: emails
+        })
+      }
+      // return Promise.resolve();
+    }).catch((error) => {
+      console.log(error)
+      console.log(error.response)
+      dispatch({
+        type: UPDATE_FORM_SETTINGS_ERROR,
+        error: error,
+        formId: formId
+      })
+    })
+  }
+}
+
+/* Reducer */
 const initialState = {
   loading: false,
   error: null,

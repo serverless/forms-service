@@ -41,6 +41,22 @@ export function deleteEntry(data) {
 }
 
 // get single form submissions
+export function updateFormSettings(formId, emails) {
+  // alert('Make API call')
+  return axios({
+    method: 'post',
+    url: config.api.updateFormSettings,
+    data: {
+      formId: formId,
+      emails: emails
+    },
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('id_token')}`
+    },
+  })
+}
+
+// get single form submissions
 export function getSingleFormData(formId) {
   // alert('Make API call')
   return axios({
