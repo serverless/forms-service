@@ -160,14 +160,16 @@ export function updateSettings(formId, emails) {
     })
     // make api call
     return updateFormSettings(formId, emails).then((response) => {
-      console.log(response)
       // request success
       if (response.data.success) {
         dispatch({
           type: UPDATE_FORM_SETTINGS_SUCCESS,
-          formId: formId,
-          emails: emails
+          payload: {
+            formId: formId,
+            emails: emails
+          }
         })
+        alert(`Form ${formId} updated with ${emails.join(', ')}`)
       }
       // return Promise.resolve();
     }).catch((error) => {
@@ -266,6 +268,18 @@ export default function formsReducer(state = initialState, action) {
         ...state,
         loading: false,
         entriesError: action.error
+      }
+    case UPDATE_FORM_SETTINGS_SUCCESS:
+      const newNotifications = state.forms.map((form) => {
+        if (form.formId === action.payload.formId) {
+          return { ...form, ...{ notify: action.payload.emails }}
+        }
+        return form
+      })
+      return {
+        ...state,
+        loading: false,
+        forms: newNotifications,
       }
     default:
       return state
