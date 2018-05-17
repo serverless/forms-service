@@ -40,7 +40,7 @@ class FormSettingsContainer extends Component {
       alert('Must have an email in here')
     }
     // Validate email addresses
-    const emailRegex = /^([\w_\.\-\+])+@([\w\-]+\.)+([\w]{2,10})+$/
+    const emailRegex = /^([\w_\.\-\+])+@([\w\-]+\.)+([\w]{2,10})+$/ // eslint-disable-line
     const emails = this.inputElement.value.split('\n')
 
     let invalidEmails = []
@@ -68,7 +68,7 @@ class FormSettingsContainer extends Component {
     })
   }
   render () {
-    const { match, forms, entriesError } = this.props
+    const { match, forms } = this.props
     const formList = forms || []
     const formId = match.params.id
 

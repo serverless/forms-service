@@ -68,7 +68,7 @@ class NavBar extends Component {
         <nav className='navbar'>
           <div className='left-nav'>
             <Link className='logo' title='logo' to='/'>
-              <img src="https://s3-us-west-2.amazonaws.com/assets.site.serverless.com/logos/serverless_logotype_1500x500%401x-white.png"/>
+              <img alt='home' src="https://s3-us-west-2.amazonaws.com/assets.site.serverless.com/logos/serverless_logotype_1500x500%401x-white.png"/>
             </Link>
             {leftNav}
           </div>

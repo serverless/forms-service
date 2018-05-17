@@ -37,7 +37,7 @@ class FormViewContainer extends Component {
     }
   }
   deleteEntry = (formData) => {
-    const { entries, forms, dispatch, match } = this.props
+    const { dispatch } = this.props
     if (window.confirm("Do you really want delete this?")) {
       dispatch(formActions.deleteFormEntry(formData)).then(() => {
         console.log('Deleted it!')
